@@ -4,7 +4,7 @@
 class Vector2D {
 public:
     // Default Constructor
-    Vector2D(float x = 0.0, float y = 0.0);
+    Vector2D(float x = 0.0f, float y = 0.0f);
 
     // Copy Constructor
     Vector2D(const Vector2D& other);
@@ -21,6 +21,11 @@ public:
     Vector2D operator+(const Vector2D& other) const;
     Vector2D operator-(const Vector2D& other) const;
     Vector2D operator*(float scalar) const;
+    Vector2D& operator=(const Vector2D& other);
+    Vector2D& operator+=(const Vector2D& other);
+    Vector2D& operator-=(const Vector2D& other);
+    Vector2D& operator*=(float scalar);
+
 private:
     float x;
     float y;  

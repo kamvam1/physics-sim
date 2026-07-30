@@ -1,11 +1,13 @@
 #include "Vector2D.h"
 #include <cmath>
 
-float EPSILON = 1e-4;
+using namespace std;
+
+float EPSILON = 1e-4f;
 
 // ------- Overloaded Constructors --------
 
-Vector2D::Vector2D(float x = 0.0, float y = 0.0)
+Vector2D::Vector2D(float x, float y)
 {
     this->x = x;
     this->y = y;
@@ -25,6 +27,49 @@ Vector2D Vector2D::operator*(float scalar) const
     return Vector2D(this->x * scalar, this->y * scalar);
 }
 
+// Addition of 2 vectors
+Vector2D Vector2D::operator+(const Vector2D& other) const
+{
+    return Vector2D(this->x + other.x, this->y + other.y);
+}
+
+// Addition of self with another vector in place
+Vector2D& Vector2D::operator+=(const Vector2D& other)
+{
+    this->x += other.x;
+    this->y += other.y;
+    return *this;
+}
+
+// Subtraction of 2 vectors
+Vector2D Vector2D::operator-(const Vector2D& other) const
+{
+    return Vector2D(this->x - other.x, this->y - other.y);
+}
+
+// Subtraction of self with another vector in place
+Vector2D& Vector2D::operator-=(const Vector2D& other)
+{
+    this->x -= other.x;
+    this->y -= other.y;
+    return *this;
+}
+
+// Linear Scaling of self with another vector in place
+Vector2D& Vector2D::operator*=(float scalar)
+{
+    this->x *= scalar;
+    this->y *= scalar;
+    return *this;
+}
+
+// Assigns other to *this
+Vector2D& Vector2D::operator=(const Vector2D& other)
+{
+    this->x = other.x;
+    this->y = other.y;
+    return *this;
+}
 
 // Checks if *this and other are equal via tolerance = EPSILON (1e-4). 
 bool Vector2D::operator==(const Vector2D& other) const
@@ -45,17 +90,6 @@ bool Vector2D::operator==(const Vector2D& other) const
     }
 }
 
-// Addition of 2 vectors
-Vector2D Vector2D::operator+(const Vector2D& other) const
-{
-    return Vector2D(this->x + other.x, this->y + other.y);
-}
-    
-// Subtraction of 2 vectors
-Vector2D Vector2D::operator-(const Vector2D& other) const
-{
-    return Vector2D(this->x - other.x, this->y - other.y);
-}
 
 // ------- Basic Math Operations --------
 
@@ -68,7 +102,7 @@ float Vector2D::Dot(const Vector2D& other) const
 // Euclidean Norm of *this
 float Vector2D::Magnitude() const
 {
-    return sqrt(pow(this->x, 2.f) + pow(this->y, 2.f));
+    return sqrt(this->x * this->x + this->y * this->y);
 }
 
 // Transforms a *this to a unit vector
@@ -76,8 +110,12 @@ Vector2D Vector2D::Normalize() const
 {
     float mag = this->Magnitude();
 
+    if (mag < EPSILON)
+    {
+        return Vector2D();
+    }
 
-    return Vector2D(this->x / (mag + EPSILON), this->y / (mag + EPSILON));
+    return Vector2D(this->x / mag, this->y / mag);
 }
 
 // Projects *this onto to_vec and returns a new scaled to_vec
