@@ -75,18 +75,14 @@ float Vector2D::Magnitude() const
 Vector2D Vector2D::Normalize() const
 {
     float mag = this->Magnitude();
-    
-    if (mag < EPSILON)
-    {
-        return Vector2D();
-    }
 
-    return Vector2D(this->x / mag, this->y / mag);
+
+    return Vector2D(this->x / (mag + EPSILON), this->y / (mag + EPSILON));
 }
 
 // Projects *this onto to_vec and returns a new scaled to_vec
 Vector2D Vector2D::Project(const Vector2D& to_vec) const
 {
-    float projection_length = this->Dot(to_vec);
+    float projection_length = this->Dot(to_vec.Normalize());
     return to_vec * projection_length;
 }
