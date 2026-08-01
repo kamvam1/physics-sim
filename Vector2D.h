@@ -26,6 +26,24 @@ public:
     Vector2D& operator-=(const Vector2D& other);
     Vector2D& operator*=(float scalar);
 
+    // Getters
+
+    // Returns x component of Vector2D
+    float getX();
+
+    // Returns y component of Vector2D
+    float getY();
+
+    // Setters
+
+    // Sets the x component of Vector2D 
+    // to_x is the new x component
+    void setX(float to_x);
+    
+    // Sets the y component of Vector2D
+    // to_y is the new y component
+    void setY(float to_y);
+
 private:
     float x;
     float y;  

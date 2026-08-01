@@ -19,6 +19,33 @@ Vector2D::Vector2D(const Vector2D& other)
     this->y = other.y;
 }
 
+// ------- Getters --------
+
+// Returns X component of *this
+float Vector2D::getX()
+{
+    return this->x;
+}
+
+// Returns Y component of *this
+float Vector2D::getY()
+{
+    return this->y;
+}
+
+// ------- Setters --------
+
+// Sets the X component of *this to to_x
+void Vector2D::setX(float to_x)
+{
+    this->x = to_x;
+}
+
+// Sets the Y component of *this to to_y
+void Vector2D::setY(float to_y)
+{
+    this->y = to_y;
+}
 // ------- Overloaded Operators --------
 
 // Linear scaling of a Vector
