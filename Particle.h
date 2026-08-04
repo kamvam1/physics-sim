@@ -29,12 +29,18 @@ class Particle
         void setVelocity(Vector2D to_vel);                
         
         // Moves the Particle as described by its velocity, changes object's position 
-        // Takes in the change in time to compute distance moved.
-        void Update(float delta_time);
+        // Takes in delta_time which is seconds per frame to compute distance moved.
+        void Update_Position(float delta_time, Vector2D acceleration);
+
+        // Updates the Particles Velocity as descirbed by Acceleration
+        // Takes in delta_time which is seconds per frame
+        // Takes in acceleration which ha a default value of 5.0f
+        void Update_Velocity(float delta_time, Vector2D acceleration);
     private:    
         // Class Members
         Vector2D velocity;
         CircleShape object;
+        float mass;
 };
 
 
