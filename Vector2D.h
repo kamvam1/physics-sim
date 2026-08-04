@@ -29,10 +29,10 @@ public:
     // Getters
 
     // Returns x component of Vector2D
-    float getX();
+    float getX() const;
 
     // Returns y component of Vector2D
-    float getY();
+    float getY() const;
 
     // Setters
 

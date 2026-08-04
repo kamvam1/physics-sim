@@ -22,13 +22,13 @@ Vector2D::Vector2D(const Vector2D& other)
 // ------- Getters --------
 
 // Returns X component of *this
-float Vector2D::getX()
+float Vector2D::getX() const
 {
     return this->x;
 }
 
 // Returns Y component of *this
-float Vector2D::getY()
+float Vector2D::getY() const
 {
     return this->y;
 }
