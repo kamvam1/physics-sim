@@ -1,3 +1,5 @@
+#include <cmath>
+
 #if !defined(VECTOR2D_H)
 #define VECTOR2D_H
 
