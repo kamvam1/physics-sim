@@ -2,10 +2,8 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Vector2.hpp>
 
-using namespace sf;
-
-#if !defined(PARTICLE)
-#define PARTICLE
+#if !defined(PARTICLE_H)
+#define PARTICLE_H
 
 class Particle
 {
@@ -14,19 +12,19 @@ class Particle
         // Default Constructor:
         // Takes in X and Y components of Velocity
         // Takes in radius to pass to CircleShape Constructor
-        Particle(float v_x = 0.0f, float v_y = 0.0f, float radius = 0.0f, float mass);
+        Particle(float v_x = 0.0f, float v_y = 0.0f, float radius = 0.0f, float mass = 0.0f);
         
         // Overloaded Default Constructor that takes in Vector2D vel, instead of components
-        Particle(Vector2D vel, float radius = 0.0f, float mass);
+        Particle(Vector2D vel, float radius = 0.0f, float mass = 0.0f);
 
         // Copy Constructor
         Particle(const Particle& other);
        
         // Returns the Velocity of the Particle
-        Vector2D getVelocity();
+        Vector2D getVelocity() const;
         
         // Returns the object of the Particle
-        CircleShape getObject();
+        const sf::CircleShape& getObject() const;
         
         // Sets the Velocity of the Particle
         // to_vel is the new velocity
@@ -43,9 +41,9 @@ class Particle
     private:    
         // Class Members
         Vector2D velocity;
-        CircleShape object;
+        sf::CircleShape object;
         float mass;
 };
 
 
-#endif // PARTICLE
+#endif // PARTICLE_H

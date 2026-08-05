@@ -1,6 +1,8 @@
 #include "Particle.h"
+#include <cmath>
 
 using namespace std;
+using namespace sf;
 
 
 // Default Constructor:
@@ -30,13 +32,13 @@ Particle::Particle(const Particle& other)
 }
 
 // Returns the Velocity of the Particle
-Vector2D Particle::getVelocity()
+Vector2D Particle::getVelocity() const
 {
     return this->velocity;
 }
 
 // Returns the object of the Particle
-CircleShape Particle::getObject()
+const CircleShape& Particle::getObject() const
 {
     return this->object;
 }
@@ -53,7 +55,7 @@ void Particle::setVelocity(const Vector2D& to_vel)
 void Particle::Update_Position(const float delta_time, const Vector2D acceleration)
 {
     Vector2f offset;
-    Vector2D delta_vel = acceleration * 0.5f * delta_time;
+    Vector2D delta_vel = acceleration * 0.5f * (delta_time * delta_time);
     offset.x = this->velocity.getX() * delta_time + delta_vel.getX();
     offset.y = this->velocity.getY() * delta_time + delta_vel.getY();
 
@@ -65,15 +67,17 @@ void Particle::Update_Position(const float delta_time, const Vector2D accelerati
 // Takes in acceleration which has a default value of 5.0f
 void Particle::Update_Velocity(const float delta_time, const Vector2D acceleration)
 {
-    Vector2D delta_vel = acceleration * 0.5f * delta_time;
+    Vector2D delta_vel = acceleration * delta_time;
     this->velocity += delta_vel;
-    if (this->velocity.getX() >= 50.f)
+    if (abs(this->velocity.getX()) >= 50.f)
     {
-        this->velocity.setX(50.f); // Limiting X component to not cause rendering problems
+        float limit = copysign(50.f, this->velocity.getX());
+        this->velocity.setX(limit); // Limiting X component to not cause rendering problems
     }
 
-    if (this->velocity.getY() >= 50.f)
+    if (abs(this->velocity.getY()) >= 50.f)
     {
-        this->velocity.setY(50.f); // Limiting Y component to not cause rendering problems
+        float limit = copysign(50.f, this->velocity.getY());
+        this->velocity.setY(limit); // Limiting Y component to not cause rendering problems
     }
 }
