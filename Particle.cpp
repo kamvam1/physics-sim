@@ -62,9 +62,18 @@ void Particle::Update_Position(const float delta_time, const Vector2D accelerati
 
 // Updates the Particles Velocity as descirbed by Acceleration in place
 // Takes in delta_time which is seconds per frame
-// Takes in acceleration which ha a default value of 5.0f
+// Takes in acceleration which has a default value of 5.0f
 void Particle::Update_Velocity(const float delta_time, const Vector2D acceleration)
 {
     Vector2D delta_vel = acceleration * 0.5f * delta_time;
     this->velocity += delta_vel;
+    if (this->velocity.getX() >= 50.f)
+    {
+        this->velocity.setX(50.f); // Limiting X component to not cause rendering problems
+    }
+
+    if (this->velocity.getY() >= 50.f)
+    {
+        this->velocity.setY(50.f); // Limiting Y component to not cause rendering problems
+    }
 }

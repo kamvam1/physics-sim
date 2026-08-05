@@ -38,7 +38,7 @@ class Particle
 
         // Updates the Particles Velocity as descirbed by Acceleration in place
         // Takes in delta_time which is seconds per frame
-        // Takes in acceleration which ha a default value of 5.0f
+        // Takes in acceleration which has a default value of 5.0f
         void Update_Velocity(const float delta_time, const Vector2D acceleration);
     private:    
         // Class Members
