@@ -151,3 +151,9 @@ Vector2D Vector2D::Project(const Vector2D& to_vec) const
     float projection_length = this->Dot(to_vec.Normalize());
     return to_vec * projection_length;
 }
+
+float Vector2D::Dist(const Vector2D& other)
+{
+    Vector2D dist = other - *this;
+    return dist.Magnitude();
+}

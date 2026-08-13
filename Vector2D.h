@@ -14,7 +14,7 @@ public:
     float Magnitude() const;
     Vector2D Normalize() const;
     Vector2D Project(const Vector2D& to_vec) const;
-
+    float Dist(const Vector2D& other);
 
     // Overloaded Operators
     bool operator==(const Vector2D& other) const;
