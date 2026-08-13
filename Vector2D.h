@@ -1,3 +1,5 @@
+#include <SFML/System/Vector2.hpp>
+
 #if !defined(VECTOR2D_H)
 #define VECTOR2D_H
 
@@ -7,7 +9,11 @@ public:
     Vector2D(float x = 0.0f, float y = 0.0f);
 
     // Copy Constructor
+    // Copies from Vector2D
     Vector2D(const Vector2D& other);
+
+    // Copies from SFML Vector2f
+    Vector2D(const sf::Vector2f& other);
 
     // Basic Vector Math Operations
     float Dot(const Vector2D& other) const;

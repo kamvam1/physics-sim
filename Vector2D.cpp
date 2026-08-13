@@ -2,6 +2,7 @@
 #include <cmath>
 
 using namespace std;
+using namespace sf;
 
 float EPSILON = 1e-4f;
 
@@ -14,6 +15,12 @@ Vector2D::Vector2D(float x, float y)
 }
 
 Vector2D::Vector2D(const Vector2D& other)
+{
+    this->x = other.x;
+    this->y = other.y;
+}
+
+Vector2D::Vector2D(const Vector2f& other)
 {
     this->x = other.x;
     this->y = other.y;
