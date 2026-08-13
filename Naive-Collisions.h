@@ -12,11 +12,11 @@ class Naive_Collisions
         // detects a collision between Particles A and B.
         bool detect(const Particle& A, const Particle& B);
 
-        // detects a collision between a particle and the walls of the simulation
-        bool detect(const Particle& A, float boundaries[4]);
-
-        // Handles the post boundary collision velocities of particle A
-        void resolve(Particle& A);
+        // detects and resolves a collision between a particle and the walls of the simulation
+        // Boundaries is an Array of floats arranged clockwise for the walls of the simulation:
+        // boundaries[0] is top wall, boundaries[1] is right-most wall, boundaries[2] is bottom wall
+        // boundaries[3] is left-most wall
+        void detect_resolve(Particle& A, float boundaries[4]);
 
         // Handles the post collision velocities of both particle A and B
         void resolve(Particle& A, Particle& B);

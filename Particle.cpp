@@ -45,6 +45,12 @@ const CircleShape& Particle::getObject() const
     return this->object;
 }
 
+// Returns the mass of the Particle
+float Particle::getMass() const
+{
+    return this->mass;
+}
+
 // Sets the Velocity of the Particle
 // to_vel is the new velocity
 void Particle::setVelocity(const Vector2D& to_vel)
