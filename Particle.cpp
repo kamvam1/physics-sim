@@ -12,6 +12,7 @@ Particle::Particle(float v_x, float v_y, float radius, float mass)
 {
     this->velocity = Vector2D(v_x, v_y);
     this->object = CircleShape(radius);
+    this->object.setOrigin(Vector2f(radius, radius));
     this->mass = mass;
 }
 
@@ -20,6 +21,7 @@ Particle::Particle(Vector2D vel, float radius, float mass)
 {
     this->velocity = vel;
     this->object = CircleShape(radius);
+    this->object.setOrigin(Vector2f(radius, radius));
     this->mass = mass;
 }
 
