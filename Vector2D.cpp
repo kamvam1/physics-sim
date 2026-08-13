@@ -159,6 +159,7 @@ Vector2D Vector2D::Project(const Vector2D& to_vec) const
     return to_vec * projection_length;
 }
 
+// Calculates distance between *this and other
 float Vector2D::Dist(const Vector2D& other)
 {
     Vector2D dist = other - *this;
