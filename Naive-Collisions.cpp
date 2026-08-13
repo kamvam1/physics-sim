@@ -38,7 +38,7 @@ void Naive_Collisions::detect_resolve(Particle& A, float boundaries[4])
     
     if (vel.getX() > 0)
     {
-        if ((pos.getX() - radius) >= boundaries[1])
+        if ((pos.getX() + radius) >= boundaries[1])
         {
             vel.setX(vel.getX() * -1);
             A.setVelocity(vel);
@@ -47,7 +47,7 @@ void Naive_Collisions::detect_resolve(Particle& A, float boundaries[4])
 
     if (vel.getX() < 0)
     {
-        if ((pos.getX() + radius) >= boundaries[3])
+        if ((pos.getX() - radius) >= boundaries[3])
         {
             vel.setX(vel.getX() * -1);
             A.setVelocity(vel);
