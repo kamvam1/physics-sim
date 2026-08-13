@@ -9,10 +9,16 @@
 class Naive_Collisions
 {
     public:
-        // Function that detects a collision between Particles A and B.
-        bool detect(const Particle& A,const Particle& B);
+        // detects a collision between Particles A and B.
+        bool detect(const Particle& A, const Particle& B);
 
-        // Handles the post collision velocities
+        // detects a collision between a particle and the walls of the simulation
+        bool detect(const Particle& A, float boundaries[4]);
+
+        // Handles the post boundary collision velocities of particle A
+        void resolve(Particle& A);
+
+        // Handles the post collision velocities of both particle A and B
         void resolve(Particle& A, Particle& B);
 };
 
