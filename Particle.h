@@ -26,7 +26,7 @@ class Particle
         // Returns the object of the Particle
         const sf::CircleShape& getObject() const;
 
-        // Returns the Mass of the Particle
+        // Returns the mass of the Particle
         float getMass() const;
         
         // Sets the Velocity of the Particle
