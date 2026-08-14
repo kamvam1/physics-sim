@@ -16,13 +16,14 @@ find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 # List every .cpp file that should be compiled into the executable.
 set(SOURCES
     main.cpp
+    Vector2D.cpp
 )
 
 add_executable(PhysicsSim ${SOURCES})
 
 # Headers 
 target_sources(PhysicsSim PRIVATE
-    
+    Vector2D.hpp
 )
 
 target_link_libraries(PhysicsSim sfml-graphics sfml-window sfml-system)
