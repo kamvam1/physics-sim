@@ -28,10 +28,17 @@ class Particle
 
         // Returns the mass of the Particle
         float getMass() const;
+
+        // Returns whether or not rendering *this is required
+        bool getRender() const;
         
         // Sets the Velocity of the Particle
         // to_vel is the new velocity
-        void setVelocity(const Vector2D& to_vel);                
+        void setVelocity(const Vector2D& to_vel);  
+        
+        // Sets the render member of the Particle.
+        // to_render is the new render
+        void setRender(const bool& to_render);
         
         // Moves the Particle as described by its velocity, changes object's position in place
         // Takes in delta_time which is seconds per frame to compute distance moved.
@@ -46,6 +53,7 @@ class Particle
         Vector2D velocity;
         sf::CircleShape object;
         float mass;
+        bool render;
 };
 
 
