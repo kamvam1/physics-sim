@@ -17,13 +17,15 @@ find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 set(SOURCES
     main.cpp
     Vector2D.cpp
+    Particle.cpp
 )
 
 add_executable(PhysicsSim ${SOURCES})
 
 # Headers 
 target_sources(PhysicsSim PRIVATE
-    Vector2D.hpp
+    Vector2D.h
+    Particle.h
 )
 
 target_link_libraries(PhysicsSim sfml-graphics sfml-window sfml-system)
