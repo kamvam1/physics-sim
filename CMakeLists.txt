@@ -18,6 +18,7 @@ set(SOURCES
     main.cpp
     Vector2D.cpp
     Particle.cpp
+    Naive_Collisions.cpp
 )
 
 add_executable(PhysicsSim ${SOURCES})
@@ -26,6 +27,7 @@ add_executable(PhysicsSim ${SOURCES})
 target_sources(PhysicsSim PRIVATE
     Vector2D.h
     Particle.h
+    Naive_Collisions.h
 )
 
 target_link_libraries(PhysicsSim sfml-graphics sfml-window sfml-system)
