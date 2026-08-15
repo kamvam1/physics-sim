@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Vector2D.h"
 #include "Particle.h"
 #include "Naive-Collisions.h"
@@ -7,13 +8,19 @@
 using namespace sf;
 using namespace std;
 
-// Checks whether the user pressed a button in the simulation
-bool ButtonPressed(RectangleShape button, Vector2f click_position)
+struct Button
 {
-    float length = button.getSize().x;
-    float width = button.getSize().y;
-    float button_x_position = button.getPosition().x;
-    float button_y_position = button.getPosition().y;
+    RectangleShape rect;
+    Text text;
+};
+
+// Checks whether the user pressed a button in the simulation
+bool ButtonPressed(Button b, Vector2f click_position)
+{
+    float length = b.rect.getSize().x;
+    float width = b.rect.getSize().y;
+    float button_x_position = b.rect.getPosition().x;
+    float button_y_position = b.rect.getPosition().y;
 
     float right_boundary = button_x_position + length / 2;
     float left_boundary = button_x_position - length / 2;
@@ -33,11 +40,71 @@ bool ButtonPressed(RectangleShape button, Vector2f click_position)
 }
 
 
+void start_menu(RenderWindow& window)
+{
+    Font font;
+    if (!font.loadFromFile("../fonts/0xProtoNerdFont-Regular.ttf"))
+    {
+        cout << "Could not load font" << endl;
+        window.close();
+        return;
+    }
+
+    Button buttons[3];
+    for (int i = 0; i < 3; i++)
+    {
+        buttons[i].rect.setSize(Vector2f(300.f, 150.f));
+        buttons[i].rect.setOrigin(150.f, 75.f);
+
+        buttons[i].text.setFont(font);
+        buttons[i].text.setCharacterSize(28);
+    }
+    buttons[0].rect.setFillColor(Color::Green);
+    buttons[0].text.setFillColor(Color::Black);
+    buttons[0].text.setString("Start Simulation");
+    buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f - 300.f));
+    buttons[0].text.setPosition(buttons[0].rect.getPosition());
+
+    buttons[1].rect.setFillColor(Color::Black);
+    buttons[1].text.setFillColor(Color::White);
+    buttons[1].text.setString("Change Simulation Constants");
+    buttons[1].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
+    buttons[1].text.setPosition(buttons[1].rect.getPosition());
+
+    buttons[2].rect.setFillColor(Color::Red);
+    buttons[2].text.setFillColor(Color::Black);
+    buttons[2].text.setString("Exit");
+    buttons[2].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f + 300.f));
+    buttons[2].text.setPosition(buttons[2].rect.getPosition());
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+            {
+                window.close();
+            }
+
+            window.clear(Color(190, 190, 190));
+
+            for (int i = 0; i < 3; i++)
+            {
+                window.draw(buttons[i].rect);
+                window.draw(buttons[i].text);
+            }
+
+            window.display();
+        }
+    }
+}
+
+
 int main()
 {
-      
-
-
+    RenderWindow window(VideoMode(1280, 720),"Menu");
+    start_menu(window);
 
     return 0;
 }
