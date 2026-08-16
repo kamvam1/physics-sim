@@ -4,6 +4,7 @@
 #include "Naive-Collisions.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <string>
 
 using namespace sf;
 using namespace std;
@@ -41,28 +42,30 @@ bool ButtonPressed(Button b, float x_pos, float y_pos)
 }
 
 // Allows user to change certain constants used in the simulation.
-void settings_menu(RenderWindow& window, Font& font)
+void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int collision_detection = 1)
 {
-    Button buttons[1];
+    window.setTitle("Settings");
 
-    buttons[0].text.setString("Back to Menu");
+    Button interactable_buttons[1];
+
+    interactable_buttons[0].text.setString("Back to Menu");
 
 
     for (int i = 0; i < 1; i++)
     {
-        buttons[i].rect.setSize(Vector2f(600.f, 150.f));
-        buttons[i].rect.setOrigin(300.f, 75.f);
+        interactable_buttons[i].rect.setSize(Vector2f(450.f, 150.f));
+        interactable_buttons[i].rect.setOrigin(interactable_buttons[i].rect.getSize().x / 2.f, interactable_buttons[i].rect.getSize().y / 2.f);
 
-        buttons[i].text.setFont(font);
-        buttons[i].text.setCharacterSize(28);
-        FloatRect bounds = buttons[i].text.getLocalBounds();
-        buttons[i].text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+        interactable_buttons[i].text.setFont(font);
+        interactable_buttons[i].text.setCharacterSize(28);
+        FloatRect bounds = interactable_buttons[i].text.getLocalBounds();
+        interactable_buttons[i].text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
     }
     
-    buttons[0].rect.setFillColor(Color::Red);
-    buttons[0].text.setFillColor(Color::Black);
-    buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
-    buttons[0].text.setPosition(buttons[0].rect.getPosition());
+    interactable_buttons[0].rect.setFillColor(Color::Red);
+    interactable_buttons[0].text.setFillColor(Color::Black);
+    interactable_buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f + 620.f));
+    interactable_buttons[0].text.setPosition(interactable_buttons[0].rect.getPosition());
 
     while (window.isOpen())
     {
@@ -79,15 +82,15 @@ void settings_menu(RenderWindow& window, Font& font)
                 View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
                 window.setView(view);
 
-                buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
-                buttons[0].text.setPosition(buttons[0].rect.getPosition());
+                interactable_buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f + 620.f));
+                interactable_buttons[0].text.setPosition(interactable_buttons[0].rect.getPosition());
             }
         }
 
         if (Mouse::isButtonPressed(Mouse::Left))
         {
             Vector2i click_position = Mouse::getPosition(window);
-            if (ButtonPressed(buttons[0], click_position.x, click_position.y))
+            if (ButtonPressed(interactable_buttons[0], click_position.x, click_position.y))
             {
                 return;
             }
@@ -97,8 +100,8 @@ void settings_menu(RenderWindow& window, Font& font)
 
         for (int i = 0; i < 1; i++)
         {
-            window.draw(buttons[i].rect);
-            window.draw(buttons[i].text);
+            window.draw(interactable_buttons[i].rect);
+            window.draw(interactable_buttons[i].text);
         }
 
         window.display();
@@ -166,8 +169,6 @@ int start_menu(RenderWindow& window, Font& font)
                 buttons[2].text.setPosition(buttons[2].rect.getPosition());
 
             }
-            
-
         }
         if (Mouse::isButtonPressed(Mouse::Left))
         {
@@ -212,8 +213,10 @@ int main()
         cout << "Could not load font" << endl;
         window.close();
         return -1;
-    }
-    
+    }   
+
+    Vector2D acceleration(0.f, 10.f); // gravity 
+    int collision_detection = 1; // 1 for brute force, 2 for tree (experimental).
     int option = start_menu(window, font);
     
     while (option != 2)
@@ -226,7 +229,7 @@ int main()
         }
         else if (option == 1)
         {
-            settings_menu(window, font);
+            settings_menu(window, font, acceleration, collision_detection);
         }
     }
 
