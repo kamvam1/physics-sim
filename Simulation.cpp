@@ -219,6 +219,7 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
 // if exit is pressed window closes and function returns 0.
 int start_menu(RenderWindow& window, Font& font)
 {
+    window.setTitle("Menu");
     Button buttons[3];
     
     buttons[0].text.setString("Start Simulation");
@@ -339,6 +340,6 @@ int main()
             settings_menu(window, font, acceleration, collision_detection);
         }
     }
-
+    
     return 0;
 }
