@@ -45,9 +45,13 @@ bool ButtonPressed(Button b, float x_pos, float y_pos)
 void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int collision_detection = 1)
 {
     window.setTitle("Settings");
+    
+    // Current Acceleration
+    string acc_x = to_string(acceleration.getX());
+    string acc_y = to_string(acceleration.getY());
 
     Button interactable_buttons[3];
-    Button text_boxes[3];
+    Button text_boxes[5];
 
     interactable_buttons[0].text.setString("Back to Menu");
     interactable_buttons[1].text.setString("Brute Force");
@@ -71,22 +75,29 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     interactable_buttons[0].text.setPosition(interactable_buttons[0].rect.getPosition());
 
     // Brute Force Algorithm: Green means currently chosen.
+    //Red means currently not chosen
     interactable_buttons[1].rect.setFillColor(Color::Green);
     interactable_buttons[1].text.setFillColor(Color::Black);
     interactable_buttons[1].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 5.f + 650.f));
     interactable_buttons[1].text.setPosition(interactable_buttons[1].rect.getPosition());
-
-    // Tree Algorithm, Red means currently not chosen
+    
+    // Tree Algorithm button 
     interactable_buttons[2].rect.setFillColor(Color::Red);
     interactable_buttons[2].text.setFillColor(Color::Black);
     interactable_buttons[2].rect.setPosition(Vector2f(window.getSize().x * 0.75f, window.getSize().y / 5.f + 650.f));
     interactable_buttons[2].text.setPosition(interactable_buttons[2].rect.getPosition());
 
+    float right_most = interactable_buttons[2].rect.getPosition().x + interactable_buttons[2].rect.getSize().x / 2.f;
+    float left_most = interactable_buttons[1].rect.getPosition().x + interactable_buttons[1].rect.getSize().x / 2.f;
+    float length = right_most - left_most;
+
     text_boxes[0].text.setString("X-Axis Acceleration:");
     text_boxes[1].text.setString("Y-Axis Acceleration:");
     text_boxes[2].text.setString("Collision Detection Algorithm:");
+    text_boxes[3].text.setString(acc_x);
+    text_boxes[4].text.setString(acc_y);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 5; i++)
     {
         text_boxes[i].rect.setSize(Vector2f(450.f, 150.f));
         text_boxes[i].rect.setOrigin(text_boxes[i].rect.getSize().x / 2.f, text_boxes[i].rect.getSize().y / 2.f);
@@ -94,6 +105,11 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
         if (i == 2)
         {
             text_boxes[i].rect.setSize(Vector2f(550.f, 150.f));
+            text_boxes[i].rect.setOrigin(text_boxes[i].rect.getSize().x / 2.f, text_boxes[i].rect.getSize().y / 2.f);
+        }
+        if (i == 3 || i == 4)
+        {
+            text_boxes[i].rect.setSize(Vector2f(200.f, 200.f));
             text_boxes[i].rect.setOrigin(text_boxes[i].rect.getSize().x / 2.f, text_boxes[i].rect.getSize().y / 2.f);
         }
         text_boxes[i].text.setFont(font);
@@ -112,6 +128,12 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     text_boxes[2].rect.setPosition(window.getSize().x / 6.f, window.getSize().y / 5.f + 650.f);
     text_boxes[2].text.setPosition(text_boxes[2].rect.getPosition());
     
+    text_boxes[3].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f);
+    text_boxes[3].text.setPosition(text_boxes[3].rect.getPosition());
+
+    text_boxes[4].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f + 350.f);
+    text_boxes[4].text.setPosition(text_boxes[4].rect.getPosition());
+
     while (window.isOpen())
     {
         Event event;
@@ -144,7 +166,12 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     
                 text_boxes[2].rect.setPosition(window.getSize().x / 6.f, window.getSize().y / 5.f + 650.f);
                 text_boxes[2].text.setPosition(text_boxes[2].rect.getPosition());
-    
+                
+                text_boxes[3].rect.setPosition(window.getSize().x * 0.8f, window.getSize().y / 5.f);
+                text_boxes[3].text.setPosition(text_boxes[3].rect.getPosition());
+                        
+                text_boxes[4].rect.setPosition(window.getSize().x * 0.8f, window.getSize().y / 5.f + 350.f);
+                text_boxes[4].text.setPosition(text_boxes[4].rect.getPosition());
             }
         }
 
@@ -176,6 +203,10 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
             window.draw(interactable_buttons[i].rect);
             window.draw(interactable_buttons[i].text);
 
+        }
+        
+        for (int i = 0; i < 5; i++)
+        {
             window.draw(text_boxes[i].rect);
             window.draw(text_boxes[i].text);
         }
