@@ -41,6 +41,31 @@ bool ButtonPressed(Button b, float x_pos, float y_pos)
     return false;
 }
 
+// Overload of ButtonPressed that takes RectangleShape instead of Button
+bool ButtonPressed(RectangleShape rect, float x_pos, float y_pos)
+{
+    float length = rect.getSize().x;
+    float width = rect.getSize().y;
+    float button_x_position = rect.getPosition().x;
+    float button_y_position = rect.getPosition().y;
+
+    float right_boundary = button_x_position + length / 2;
+    float left_boundary = button_x_position - length / 2;
+    
+    float upper_boundary = (button_y_position - width / 2);
+    float lower_boundary = (button_y_position + width / 2);
+
+    if (x_pos >= left_boundary && x_pos <= right_boundary)
+    {
+        if (y_pos >= upper_boundary && y_pos <= lower_boundary)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // Allows user to change certain constants used in the simulation.
 void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int collision_detection = 1)
 {
@@ -52,16 +77,19 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
 
     Button interactable_buttons[3];
     Button text_boxes[5];
+    RectangleShape lines[2];
+    RectangleShape draggables[2];
 
     interactable_buttons[0].text.setString("Back to Menu");
     interactable_buttons[1].text.setString("Brute Force");
     interactable_buttons[2].text.setString("Tree (experimental)");
 
+    
     for (int i = 0; i < 3; i++)
     {
         interactable_buttons[i].rect.setSize(Vector2f(450.f, 150.f));
         interactable_buttons[i].rect.setOrigin(interactable_buttons[i].rect.getSize().x / 2.f, interactable_buttons[i].rect.getSize().y / 2.f);
-
+        
         interactable_buttons[i].text.setFont(font);
         interactable_buttons[i].text.setCharacterSize(28);
         FloatRect bounds = interactable_buttons[i].text.getLocalBounds();
@@ -86,11 +114,23 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     interactable_buttons[2].text.setFillColor(Color::Black);
     interactable_buttons[2].rect.setPosition(Vector2f(window.getSize().x * 0.75f, window.getSize().y / 5.f + 650.f));
     interactable_buttons[2].text.setPosition(interactable_buttons[2].rect.getPosition());
-
+    
     float right_most = interactable_buttons[2].rect.getPosition().x + interactable_buttons[2].rect.getSize().x / 2.f;
-    float left_most = interactable_buttons[1].rect.getPosition().x + interactable_buttons[1].rect.getSize().x / 2.f;
+    float left_most = interactable_buttons[1].rect.getPosition().x - interactable_buttons[1].rect.getSize().x / 2.f;
     float length = right_most - left_most;
+    
+    for (int i = 0; i < 2; i++)
+    {
+        lines[i].setSize(Vector2f(length, 15.f));
+        lines[i].setOrigin(lines[i].getSize().x / 2, lines[i].getSize().y / 2.f);
 
+        draggables[i].setSize(Vector2f(20.f,70.f));
+        draggables[i].setOrigin(draggables[i].getSize().x / 2.f, draggables[i].getSize().y / 2.f);
+
+        lines[i].setFillColor(Color::Black);
+        draggables[i].setFillColor(Color::White);
+    }
+    
     text_boxes[0].text.setString("X-Axis Acceleration:");
     text_boxes[1].text.setString("Y-Axis Acceleration:");
     text_boxes[2].text.setString("Collision Detection Algorithm:");
@@ -134,6 +174,12 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     text_boxes[4].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f + 350.f);
     text_boxes[4].text.setPosition(text_boxes[4].rect.getPosition());
 
+    lines[0].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f);
+    lines[1].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f + 350.f);
+
+    draggables[0].setPosition(left_most, window.getSize().y / 5.f);
+    draggables[1].setPosition(left_most + acceleration.getY() / 15.f * length, window.getSize().y / 5.f + 350.f);
+
     while (window.isOpen())
     {
         Event event;
@@ -167,11 +213,20 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
                 text_boxes[2].rect.setPosition(window.getSize().x / 6.f, window.getSize().y / 5.f + 650.f);
                 text_boxes[2].text.setPosition(text_boxes[2].rect.getPosition());
                 
-                text_boxes[3].rect.setPosition(window.getSize().x * 0.8f, window.getSize().y / 5.f);
+                text_boxes[3].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f);
                 text_boxes[3].text.setPosition(text_boxes[3].rect.getPosition());
                         
-                text_boxes[4].rect.setPosition(window.getSize().x * 0.8f, window.getSize().y / 5.f + 350.f);
+                text_boxes[4].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f + 350.f);
                 text_boxes[4].text.setPosition(text_boxes[4].rect.getPosition());
+                
+                right_most = lines[0].getSize().x / 2.f + lines[0].getOrigin().x;
+                left_most = lines[0].getOrigin().x - lines[0].getSize().x / 2.f;
+
+                lines[0].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f);
+                lines[1].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f + 350.f);
+
+                draggables[0].setPosition(left_most, window.getSize().y / 5.f);
+                draggables[1].setPosition(left_most + acceleration.getY() / 15.f * length, window.getSize().y / 5.f + 350.f);
             }
         }
 
@@ -194,6 +249,56 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
                 interactable_buttons[1].rect.setFillColor(Color::Red);
                 interactable_buttons[2].rect.setFillColor(Color::Green);
             }
+            else if (ButtonPressed(draggables[0], click_position.x, click_position.y)
+                    || ButtonPressed(lines[0], click_position.x, click_position.y)
+                    )
+            {
+                draggables[0].setPosition(click_position.x, window.getSize().y / 5.f);
+                
+                acceleration.setX((click_position.x - left_most) / length * 15.f);
+
+                acc_x = to_string(acceleration.getX());
+
+                if (draggables[0].getPosition().x >= right_most)
+                {
+                    draggables[0].setPosition(right_most, window.getSize().y / 5.f);
+                    acceleration.setX(15.f);
+                    acc_x = to_string(acceleration.getX());
+                }
+                else if (draggables[0].getPosition().x <= left_most)
+                {
+                    draggables[0].setPosition(left_most, window.getSize().y / 5.f);
+                    acceleration.setX(0.f);
+                    acc_x = to_string(acceleration.getX());
+                }
+                
+                text_boxes[3].text.setString(acc_x);
+            }
+            else if (ButtonPressed(draggables[1], click_position.x, click_position.y)
+            || ButtonPressed(lines[1], click_position.x, click_position.y)
+                    )
+                    {
+                draggables[1].setPosition(click_position.x, window.getSize().y / 5.f + 350.f);
+                
+                acceleration.setY((click_position.x - left_most) / length * 15.f);
+                
+                acc_y = to_string(acceleration.getY());
+                
+                if (draggables[1].getPosition().x >= right_most)
+                {
+                    draggables[1].setPosition(right_most, window.getSize().y / 5.f + 350.f);
+                    acceleration.setY(15.f);
+                    acc_y = to_string(acceleration.getY());
+                }
+                else if (draggables[1].getPosition().x <= left_most)
+                {
+                    draggables[1].setPosition(left_most, window.getSize().y / 5.f + 350.f);
+                    acceleration.setY(0.f);
+                    acc_y = to_string(acceleration.getY());
+                }
+                
+                text_boxes[4].text.setString(acc_y);
+            }
         }
         
         window.clear(Color(190,190,190));
@@ -209,6 +314,12 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
         {
             window.draw(text_boxes[i].rect);
             window.draw(text_boxes[i].text);
+        }
+
+        for (int i = 0; i < 2; i++)
+        {
+            window.draw(lines[i]);
+            window.draw(draggables[i]);
         }
 
         window.display();
