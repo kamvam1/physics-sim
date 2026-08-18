@@ -66,6 +66,34 @@ bool ButtonPressed(RectangleShape rect, float x_pos, float y_pos)
     return false;
 }
 
+void brute_force(vector<Particle>& particles)
+{
+    Naive_Collisions physics;
+
+    for (int i = 0; i < particles.size() - 1; i++)
+    {
+        Particle A = particles[i];
+        for (int j = i + 1; j < particles.size(); i++)
+        {
+            Particle B = particles[j];
+            if (physics.detect(A, B))
+            {
+                physics.resolve(A, B);
+            }
+        }
+    }
+}
+
+void boundary_collision(vector<Particle>& particles, float boundaries[4])
+{
+    Naive_Collisions physics;
+
+    for (int i = 0; i < particles.size(); i++)
+    {
+        physics.detect_resolve(particles[i], boundaries);
+    }
+}
+
 // Allows user to change certain constants used in the simulation.
 void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int collision_detection = 1)
 {
@@ -451,6 +479,146 @@ int main()
         {
             settings_menu(window, font, acceleration, collision_detection);
         }
+    }
+
+    RectangleShape sim_boundary; // Box where the particles will be simulated.
+    
+    sim_boundary.setFillColor(Color::White);
+    sim_boundary.setOutlineThickness(10.f);
+    sim_boundary.setOutlineColor(Color::Cyan);
+
+    sim_boundary.setSize(Vector2f(window.getSize().x * 0.70f, window.getSize().y - 15.f));
+    sim_boundary.setOrigin(sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f);
+    sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
+
+    Button buttons[3];
+
+    buttons[0].text.setString("Create Particle");
+    buttons[1].text.setString("Delete Particle");
+    buttons[2].text.setString("Exit");
+    
+    for (int i = 0; i < 3; i++)
+    {
+        buttons[i].rect.setSize(Vector2f(400.f, 150.f));
+        buttons[i].rect.setOrigin(buttons[i].rect.getSize().x / 2.f, buttons[i].rect.getSize().y / 2.f);
+        
+        buttons[i].text.setFillColor(Color::Black);
+        buttons[i].text.setFont(font);
+        buttons[i].text.setCharacterSize(28);
+        FloatRect bounds = buttons[i].text.getLocalBounds();
+        buttons[i].text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+    }
+
+    buttons[0].rect.setFillColor(Color::Green);
+    buttons[1].rect.setFillColor(Color::Red);
+    buttons[2].rect.setFillColor(Color::Red);
+
+    buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
+    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.8f);
+
+    buttons[0].text.setPosition(buttons[0].rect.getPosition());
+    buttons[1].text.setPosition(buttons[1].rect.getPosition());
+    buttons[2].text.setPosition(buttons[2].rect.getPosition());
+
+    bool create_particle = false; // When Create Particle Button is pressed, this will be true
+    bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+            {
+                window.close();
+            }
+
+            if (event.type == Event::Resized)
+            {
+                View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
+                window.setView(view);
+
+                sim_boundary.setSize(Vector2f(window.getSize().x * 0.70f, window.getSize().y - 15.f));
+
+                buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+                buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
+                buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.8f);
+
+                buttons[0].text.setPosition(buttons[0].rect.getPosition());
+                buttons[1].text.setPosition(buttons[1].rect.getPosition());
+                buttons[2].text.setPosition(buttons[2].rect.getPosition());
+            }
+        }
+
+
+        window.clear(Color(170,170,170));
+
+        window.draw(sim_boundary);
+        
+        if (!create_particle && !delete_particle)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                window.draw(buttons[i].rect);
+                window.draw(buttons[i].text);
+            }
+
+            if (Mouse::isButtonPressed(Mouse::Left))
+            {
+                Vector2i click_position = Mouse::getPosition(window);
+                if (ButtonPressed(buttons[0], click_position.x, click_position.y))
+                {
+                    create_particle = true;
+                }
+                else if (ButtonPressed(buttons[1], click_position.x, click_position.y))
+                {   
+                    delete_particle = true;
+                }
+                else if (ButtonPressed(buttons[2], click_position.x, click_position.y))
+                {
+                    window.close();
+                }
+            }
+        }
+
+
+
+        if (create_particle)
+        {
+            // render sliders
+            // render create button
+            // set create_particle to false.
+            Button create;
+            
+            create.rect.setSize(Vector2f(450.f,150.f));
+            create.rect.setOrigin(create.rect.getSize().x / 2.f, create.rect.getSize().y / 2.f);
+            create.rect.setFillColor(Color::Green);
+
+            create.text.setString("Create Particle");
+            create.text.setFont(font);
+            create.text.setCharacterSize(28);
+            create.text.setFillColor(Color::Black);
+            FloatRect bounds = create.text.getLocalBounds();
+            create.text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+            if (Mouse::isButtonPressed(Mouse::Left))
+            {
+                
+            }
+            create_particle = false;
+        }
+
+        if (delete_particle)
+        {
+            // render text
+            // see click_position
+            // figure out which particle was pressed
+            // set delete_particle to false;
+            delete_particle = false;
+        }
+
+
+        window.display();
     }
     
     return 0;
