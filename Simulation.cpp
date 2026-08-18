@@ -70,7 +70,7 @@ bool ButtonPressed(RectangleShape rect, float x_pos, float y_pos)
 void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int collision_detection = 1)
 {
     window.setTitle("Settings");
-    
+
     // Current Acceleration
     string acc_x = to_string(acceleration.getX());
     string acc_y = to_string(acceleration.getY());
@@ -115,15 +115,11 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     interactable_buttons[2].rect.setPosition(Vector2f(window.getSize().x * 0.75f, window.getSize().y / 5.f + 650.f));
     interactable_buttons[2].text.setPosition(interactable_buttons[2].rect.getPosition());
     
-    float right_most = interactable_buttons[2].rect.getPosition().x + interactable_buttons[2].rect.getSize().x / 2.f;
-    float left_most = interactable_buttons[1].rect.getPosition().x - interactable_buttons[1].rect.getSize().x / 2.f;
-    float length = right_most - left_most;
-    
     for (int i = 0; i < 2; i++)
     {
-        lines[i].setSize(Vector2f(length, 15.f));
+        lines[i].setSize(Vector2f(950.f, 15.f));
         lines[i].setOrigin(lines[i].getSize().x / 2, lines[i].getSize().y / 2.f);
-
+        
         draggables[i].setSize(Vector2f(20.f,70.f));
         draggables[i].setOrigin(draggables[i].getSize().x / 2.f, draggables[i].getSize().y / 2.f);
 
@@ -170,14 +166,18 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     
     text_boxes[3].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f);
     text_boxes[3].text.setPosition(text_boxes[3].rect.getPosition());
-
+    
     text_boxes[4].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f + 350.f);
     text_boxes[4].text.setPosition(text_boxes[4].rect.getPosition());
-
-    lines[0].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f);
-    lines[1].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f + 350.f);
-
-    draggables[0].setPosition(left_most, window.getSize().y / 5.f);
+    
+    lines[0].setPosition(window.getSize().x * 0.62f, window.getSize().y / 5.f);
+    lines[1].setPosition(window.getSize().x * 0.62f, window.getSize().y / 5.f + 350.f);
+    
+    float right_most = lines[0].getPosition().x + lines[0].getSize().x / 2.f;
+    float left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
+    float length = right_most - left_most;
+    
+    draggables[0].setPosition(left_most + acceleration.getX() / 15.f * length, window.getSize().y / 5.f);
     draggables[1].setPosition(left_most + acceleration.getY() / 15.f * length, window.getSize().y / 5.f + 350.f);
 
     while (window.isOpen())
@@ -189,7 +189,8 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
             {
                 window.close();
             }
-
+            
+            
             if (event.type == Event::Resized)
             {
                 View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
@@ -200,10 +201,10 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
                     
                 interactable_buttons[1].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 5.f + 650.f));
                 interactable_buttons[1].text.setPosition(interactable_buttons[1].rect.getPosition());
-
+                
                 interactable_buttons[2].rect.setPosition(Vector2f(window.getSize().x * 0.75f, window.getSize().y / 5.f + 650.f));
                 interactable_buttons[2].text.setPosition(interactable_buttons[2].rect.getPosition());
-
+                
                 text_boxes[0].rect.setPosition(window.getSize().x / 6.f, window.getSize().y / 5.f);
                 text_boxes[0].text.setPosition(text_boxes[0].rect.getPosition());
     
@@ -219,17 +220,18 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
                 text_boxes[4].rect.setPosition(window.getSize().x * 0.93f, window.getSize().y / 5.f + 350.f);
                 text_boxes[4].text.setPosition(text_boxes[4].rect.getPosition());
                 
-                right_most = lines[0].getSize().x / 2.f + lines[0].getOrigin().x;
-                left_most = lines[0].getOrigin().x - lines[0].getSize().x / 2.f;
-
-                lines[0].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f);
-                lines[1].setPosition((right_most + left_most) / 2.f, window.getSize().y / 5.f + 350.f);
-
-                draggables[0].setPosition(left_most, window.getSize().y / 5.f);
+                lines[0].setPosition(window.getSize().x * 0.62f, window.getSize().y / 5.f);
+                lines[1].setPosition(window.getSize().x * 0.62f, window.getSize().y / 5.f + 350.f);
+                
+                right_most = lines[0].getSize().x / 2.f + lines[0].getPosition().x;
+                left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
+                length = right_most - left_most;
+                
+                draggables[0].setPosition(left_most + acceleration.getX() / 15.f * length, window.getSize().y / 5.f);
                 draggables[1].setPosition(left_most + acceleration.getY() / 15.f * length, window.getSize().y / 5.f + 350.f);
             }
         }
-
+        
         if (Mouse::isButtonPressed(Mouse::Left))
         {
             Vector2i click_position = Mouse::getPosition(window);
@@ -372,21 +374,20 @@ int start_menu(RenderWindow& window, Font& font)
             {
                 window.close();
             }
-
+            
             if (event.type == Event::Resized)
             {
                 View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
                 window.setView(view);
-
+                
                 buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f - 300.f));
                 buttons[0].text.setPosition(buttons[0].rect.getPosition());
-
+                
                 buttons[1].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f));
                 buttons[1].text.setPosition(buttons[1].rect.getPosition());
-
+                
                 buttons[2].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f + 300.f));
                 buttons[2].text.setPosition(buttons[2].rect.getPosition());
-
             }
         }
         if (Mouse::isButtonPressed(Mouse::Left))
