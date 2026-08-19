@@ -66,6 +66,7 @@ bool ButtonPressed(RectangleShape rect, float x_pos, float y_pos)
     return false;
 }
 
+// Checks every particle with every other particle
 void brute_force(vector<Particle>& particles)
 {
     Naive_Collisions physics;
@@ -84,6 +85,7 @@ void brute_force(vector<Particle>& particles)
     }
 }
 
+// Handles Collisions of particles with the wall of the simulation
 void boundary_collision(vector<Particle>& particles, float boundaries[4])
 {
     Naive_Collisions physics;
@@ -449,7 +451,7 @@ int start_menu(RenderWindow& window, Font& font)
     return 0;
 }
 
-
+// Simulation window
 int main()
 {
     RenderWindow window(VideoMode(2000, 1500),"Menu");
@@ -602,7 +604,7 @@ int main()
             FloatRect bounds = create.text.getLocalBounds();
             create.text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
             
-            create.rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.85f);
+            create.rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.10f);
             create.text.setPosition(create.rect.getPosition());
 
             window.draw(create.rect);
@@ -614,7 +616,6 @@ int main()
                 if (ButtonPressed(create, click_position.x, click_position.y))
                 {
                     create_particle = false;
-
                 }
             }
         }
