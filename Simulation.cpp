@@ -15,6 +15,25 @@ struct Button
     Text text;
 };
 
+// Checks whether user clicked on a particle to delete it
+bool ParticleClicked(const Particle& p,const Vector2i& click_position)
+{
+    CircleShape obj = p.getObject();
+    float radius = obj.getRadius();
+    float x_click_pos = float(click_position.x);
+    float y_click_pos = float(click_position.y);
+    
+    float dist_x = max(x_click_pos,obj.getPosition().x) - min(x_click_pos, obj.getPosition().x);
+    float dist_y = max(y_click_pos,obj.getPosition().y) - min(y_click_pos, obj.getPosition().y);
+
+    if (dist_x <= radius && dist_y <= radius)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 // Checks whether the user pressed a button in the simulation
 // x_pos and y_pos are both positions where the mouse click happened.
 bool ButtonPressed(Button b, float x_pos, float y_pos)
@@ -468,6 +487,7 @@ int main()
     Vector2D acceleration(0.f, 10.f); // gravity 
     int collision_detection = 1; // 1 for brute force, 2 for tree (experimental).
     int option = start_menu(window, font);
+    Clock time;
     
     while (option != 2)
     {
@@ -530,170 +550,193 @@ int main()
 
     while (window.isOpen())
     {
-        Event event;
-        while (window.pollEvent(event))
+        float delta_time = time.getElapsedTime().asSeconds();
+        if (delta_time >= 1.f / 60.f)
         {
-            if (event.type == Event::Closed)
+            
+            Event event;
+            while (window.pollEvent(event))
             {
-                window.close();
-            }
-
-            if (event.type == Event::Resized)
-            {
-                View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
-                window.setView(view);
-
-                sim_boundary.setSize(Vector2f(window.getSize().x * 0.70f, window.getSize().y - 15.f));
-
-                buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
-                buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-                buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.8f);
-
-                buttons[0].text.setPosition(buttons[0].rect.getPosition());
-                buttons[1].text.setPosition(buttons[1].rect.getPosition());
-                buttons[2].text.setPosition(buttons[2].rect.getPosition());
-            }
-        }
-
-
-        window.clear(Color(170,170,170));
-
-        window.draw(sim_boundary);
-        
-        if (create_particle == false && delete_particle == false)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                window.draw(buttons[i].rect);
-                window.draw(buttons[i].text);
-            }
-
-            if (Mouse::isButtonPressed(Mouse::Left))
-            {
-                Vector2i click_position = Mouse::getPosition(window);
-                if (ButtonPressed(buttons[0], click_position.x, click_position.y))
-                {
-                    create_particle = true;
-                }
-                else if (ButtonPressed(buttons[1], click_position.x, click_position.y))
-                {   
-                    delete_particle = true;
-                }
-                else if (ButtonPressed(buttons[2], click_position.x, click_position.y))
+                if (event.type == Event::Closed)
                 {
                     window.close();
                 }
-            }
-        }
-
-        if (create_particle)
-        {
-            // render sliders
-            // render create button
-            // set create_particle to false.
-            Button create;
-            
-            create.rect.setSize(Vector2f(450.f,150.f));
-            create.rect.setOrigin(create.rect.getSize().x / 2.f, create.rect.getSize().y / 2.f);
-            create.rect.setFillColor(Color::Green);
-
-            create.text.setString("Create Particle");
-            create.text.setFont(font);
-            create.text.setCharacterSize(28);
-            create.text.setFillColor(Color::Black);
-            FloatRect bounds = create.text.getLocalBounds();
-            create.text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
-            
-            create.rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.10f);
-            create.text.setPosition(create.rect.getPosition());
-
-            window.draw(create.rect);
-            window.draw(create.text);
-
-            if (Mouse::isButtonPressed(Mouse::Left))
-            {
-                Vector2i click_position = Mouse::getPosition(window);
-                if (ButtonPressed(create, click_position.x, click_position.y))
+    
+                if (event.type == Event::Resized)
                 {
-                    create_particle = false;
+                    View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
+                    window.setView(view);
+    
+                    sim_boundary.setSize(Vector2f(window.getSize().x * 0.70f, window.getSize().y - 15.f));
+    
+                    buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+                    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
+                    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.8f);
+    
+                    buttons[0].text.setPosition(buttons[0].rect.getPosition());
+                    buttons[1].text.setPosition(buttons[1].rect.getPosition());
+                    buttons[2].text.setPosition(buttons[2].rect.getPosition());
                 }
             }
-        }
-
-        if (delete_particle)
-        {
-            // render text
-            // see click_position
-            // figure out which particle was pressed
-            // set delete_particle to false;
-
-            if (!particles.size())
+    
+    
+            for (int i = 0; i < particles.size(); i++)
             {
-                Text error;
-                error.setFont(font);
-                error.setString("Cannot Delete Particles \n    There are None");
-                error.setCharacterSize(27);
-                FloatRect bounds = error.getLocalBounds();
-                error.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);    
-                error.setFillColor(Color::Black);
-
-                error.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-
-                Button back;
-                back.rect.setSize(Vector2f(400.f, 150.f));
-                back.rect.setOrigin(back.rect.getSize().x / 2.f, back.rect.getSize().y / 2.f);
-                back.rect.setFillColor(Color::Red);
-        
-                back.text.setFillColor(Color::Black);
-                back.text.setFont(font);
-                back.text.setString("Back");
-
-                back.text.setCharacterSize(28);
-                bounds = back.text.getLocalBounds();
-                back.text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
-
-                back.rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.6f);
-                back.text.setPosition(back.rect.getPosition());
-                
-                window.draw(error);
-                window.draw(back.rect);
-                window.draw(back.text);
-                
+    
+            }
+    
+    
+            window.clear(Color(170,170,170));
+    
+            window.draw(sim_boundary);
+    
+            for (int i = 0; i < particles.size(); i++)
+            {
+                if (particles[i].getRender())
+                {
+                    window.draw(particles[i].getObject());
+                }
+            }
+            
+            if (create_particle == false && delete_particle == false)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    window.draw(buttons[i].rect);
+                    window.draw(buttons[i].text);
+                }
+    
                 if (Mouse::isButtonPressed(Mouse::Left))
                 {
                     Vector2i click_position = Mouse::getPosition(window);
-                    if (ButtonPressed(back, click_position.x, click_position.y))
+                    if (ButtonPressed(buttons[0], click_position.x, click_position.y))
                     {
-                        delete_particle = false;
+                        create_particle = true;
+                    }
+                    else if (ButtonPressed(buttons[1], click_position.x, click_position.y))
+                    {   
+                        delete_particle = true;
+                    }
+                    else if (ButtonPressed(buttons[2], click_position.x, click_position.y))
+                    {
+                        window.close();
                     }
                 }
             }
-            else
+    
+            if (create_particle)
             {
-                Text del_text;
-                del_text.setFont(font);
-                del_text.setString("Click on a Particle \n    to Delete it");
-                del_text.setCharacterSize(28);
-                FloatRect bounds = del_text.getLocalBounds();
-                del_text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
-                del_text.setFillColor(Color::Black);
-
-                del_text.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-
-                window.draw(del_text);
-
-                if (Mouse::isButtonPressed(Mouse::Left))
-                {   
-                    Vector2i click_position = Mouse::getPosition(window);
-                    
-                }
+                Button create;
                 
-                delete_particle = false;
+                create.rect.setSize(Vector2f(450.f,150.f));
+                create.rect.setOrigin(create.rect.getSize().x / 2.f, create.rect.getSize().y / 2.f);
+                create.rect.setFillColor(Color::Green);
+    
+                create.text.setString("Create Particle");
+                create.text.setFont(font);
+                create.text.setCharacterSize(28);
+                create.text.setFillColor(Color::Black);
+                FloatRect bounds = create.text.getLocalBounds();
+                create.text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+                
+                create.rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.10f);
+                create.text.setPosition(create.rect.getPosition());
+    
+                window.draw(create.rect);
+                window.draw(create.text);
+    
+                if (Mouse::isButtonPressed(Mouse::Left))
+                {
+                    Vector2i click_position = Mouse::getPosition(window);
+                    if (ButtonPressed(create, click_position.x, click_position.y))
+                    {
+                        Particle to_create(Vector2D(), 10.f, 10.f);
+                            
+                        create_particle = false;
+                    }
+                }
             }
+    
+            if (delete_particle)
+            {
+                if (!particles.size())
+                {
+                    Text error;
+                    error.setFont(font);
+                    error.setString("Cannot Delete Particles \n    There are None");
+                    error.setCharacterSize(27);
+                    FloatRect bounds = error.getLocalBounds();
+                    error.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);    
+                    error.setFillColor(Color::Black);
+    
+                    error.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
+    
+                    Button back;
+                    back.rect.setSize(Vector2f(400.f, 150.f));
+                    back.rect.setOrigin(back.rect.getSize().x / 2.f, back.rect.getSize().y / 2.f);
+                    back.rect.setFillColor(Color::Red);
+            
+                    back.text.setFillColor(Color::Black);
+                    back.text.setFont(font);
+                    back.text.setString("Back");
+    
+                    back.text.setCharacterSize(28);
+                    bounds = back.text.getLocalBounds();
+                    back.text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+    
+                    back.rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.6f);
+                    back.text.setPosition(back.rect.getPosition());
+                    
+                    window.draw(error);
+                    window.draw(back.rect);
+                    window.draw(back.text);
+                    
+                    if (Mouse::isButtonPressed(Mouse::Left))
+                    {
+                        Vector2i click_position = Mouse::getPosition(window);
+                        if (ButtonPressed(back, click_position.x, click_position.y))
+                        {
+                            delete_particle = false;
+                        }
+                    }
+                }
+                else
+                {
+                    Text del_text;
+                    del_text.setFont(font);
+                    del_text.setString("Click on a Particle \n    to Delete it");
+                    del_text.setCharacterSize(28);
+                    FloatRect bounds = del_text.getLocalBounds();
+                    del_text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+                    del_text.setFillColor(Color::Black);
+    
+                    del_text.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
+    
+                    window.draw(del_text);
+    
+                    if (Mouse::isButtonPressed(Mouse::Left))
+                    {   
+                        Vector2i click_position = Mouse::getPosition(window);
+                        for (int i = 0; i < particles.size(); i++)
+                        {
+                            if (!particles[i].getRender())
+                            {
+                                continue;
+                            }
+                            
+                            if (ParticleClicked(particles[i], click_position))
+                            {
+                                particles[i].setRender(false);
+                                delete_particle = false;
+                            }
+                        }   
+                    }
+                }
+            }
+    
+    
+            window.display();
         }
-
-
-        window.display();
     }
     
     return 0;
