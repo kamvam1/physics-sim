@@ -15,6 +15,42 @@ struct Button
     Text text;
 };
 
+// Creates a RectangleShape object and returns it
+RectangleShape CreateRectangle(const float& height,const float& width,const Color& fill_color)
+{   
+    RectangleShape rect;
+    rect.setSize(Vector2f(height, width));
+    rect.setFillColor(fill_color);
+
+    rect.setOrigin(height / 2.f, width / 2.f);
+
+    return rect;
+}
+
+// Creates a Text object and returns it
+Text CreateText(const string& display_text, const Font& font,  const int& char_size, const Color& fill_color)
+{
+    Text t;
+    t.setString(display_text);
+    t.setFillColor(fill_color);
+    t.setCharacterSize(char_size);
+    t.setFont(font);
+    FloatRect bounds = t.getLocalBounds();
+    t.setOrigin(bounds.left + bounds.width / 2.f, bounds.top + bounds.height / 2.f);
+
+    return t;
+}
+
+// Creates a Text object and returns it, without the display_text param
+void InitText(Text& to_init, const Font& font,  const int& char_size, const Color& fill_color)
+{
+    to_init.setFont(font);
+    to_init.setFillColor(fill_color);
+    to_init.setCharacterSize(char_size);
+    FloatRect bounds = to_init.getLocalBounds();
+    to_init.setOrigin(bounds.left + bounds.width / 2.f, bounds.top + bounds.height / 2.f);
+}
+
 // Checks whether user clicked on a particle to delete it
 bool ParticleClicked(const Particle& p,const Vector2i& click_position)
 {
@@ -136,44 +172,32 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     
     for (int i = 0; i < 3; i++)
     {
-        interactable_buttons[i].rect.setSize(Vector2f(450.f, 150.f));
-        interactable_buttons[i].rect.setOrigin(interactable_buttons[i].rect.getSize().x / 2.f, interactable_buttons[i].rect.getSize().y / 2.f);
+        interactable_buttons[i].rect = CreateRectangle(450.f, 150.f, Color::Red);
         
-        interactable_buttons[i].text.setFont(font);
-        interactable_buttons[i].text.setCharacterSize(28);
-        FloatRect bounds = interactable_buttons[i].text.getLocalBounds();
-        interactable_buttons[i].text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+        InitText(interactable_buttons[i].text, font, 28, Color::Black); 
     }
 
     // Back to Menu Button
     interactable_buttons[0].rect.setFillColor(Color::Red);
-    interactable_buttons[0].text.setFillColor(Color::Black);
     interactable_buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f + 620.f));
     interactable_buttons[0].text.setPosition(interactable_buttons[0].rect.getPosition());
 
     // Brute Force Algorithm: Green means currently chosen.
     //Red means currently not chosen
     interactable_buttons[1].rect.setFillColor(Color::Green);
-    interactable_buttons[1].text.setFillColor(Color::Black);
     interactable_buttons[1].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 5.f + 650.f));
     interactable_buttons[1].text.setPosition(interactable_buttons[1].rect.getPosition());
     
     // Tree Algorithm button 
     interactable_buttons[2].rect.setFillColor(Color::Red);
-    interactable_buttons[2].text.setFillColor(Color::Black);
     interactable_buttons[2].rect.setPosition(Vector2f(window.getSize().x * 0.75f, window.getSize().y / 5.f + 650.f));
     interactable_buttons[2].text.setPosition(interactable_buttons[2].rect.getPosition());
     
     for (int i = 0; i < 2; i++)
     {
-        lines[i].setSize(Vector2f(950.f, 15.f));
-        lines[i].setOrigin(lines[i].getSize().x / 2, lines[i].getSize().y / 2.f);
+        lines[i] = CreateRectangle(950.f, 15.f, Color::Black);
         
-        draggables[i].setSize(Vector2f(20.f,70.f));
-        draggables[i].setOrigin(draggables[i].getSize().x / 2.f, draggables[i].getSize().y / 2.f);
-
-        lines[i].setFillColor(Color::Black);
-        draggables[i].setFillColor(Color::White);
+        draggables[i] = CreateRectangle(20.f, 70.f, Color::White);
     }
     
     text_boxes[0].text.setString("X-Axis Acceleration:");
@@ -184,24 +208,17 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
 
     for (int i = 0; i < 5; i++)
     {
-        text_boxes[i].rect.setSize(Vector2f(450.f, 150.f));
-        text_boxes[i].rect.setOrigin(text_boxes[i].rect.getSize().x / 2.f, text_boxes[i].rect.getSize().y / 2.f);
-        text_boxes[i].rect.setFillColor(Color(180,180,180));
+        text_boxes[i].rect = CreateRectangle(450.f, 150.f, Color(180,180,180));
         if (i == 2)
         {
-            text_boxes[i].rect.setSize(Vector2f(550.f, 150.f));
-            text_boxes[i].rect.setOrigin(text_boxes[i].rect.getSize().x / 2.f, text_boxes[i].rect.getSize().y / 2.f);
+            text_boxes[i].rect = CreateRectangle(550.f,150.f,Color(180,180,180));
         }
         if (i == 3 || i == 4)
         {
-            text_boxes[i].rect.setSize(Vector2f(200.f, 200.f));
-            text_boxes[i].rect.setOrigin(text_boxes[i].rect.getSize().x / 2.f, text_boxes[i].rect.getSize().y / 2.f);
+            text_boxes[i].rect = CreateRectangle(200.f, 200.f, Color(180,180,180));
         }
-        text_boxes[i].text.setFont(font);
-        text_boxes[i].text.setCharacterSize(28);
-        FloatRect bounds = text_boxes[i].text.getLocalBounds();
-        text_boxes[i].text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
-        text_boxes[i].text.setFillColor(Color::Black);
+
+        InitText(text_boxes[i].text, font, 27, Color::Black);
     }
 
     text_boxes[0].rect.setPosition(window.getSize().x / 6.f, window.getSize().y / 5.f);
@@ -328,7 +345,7 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
             else if (ButtonPressed(draggables[1], click_position.x, click_position.y)
             || ButtonPressed(lines[1], click_position.x, click_position.y)
                     )
-                    {
+            {
                 draggables[1].setPosition(click_position.x, window.getSize().y / 5.f + 350.f);
                 
                 acceleration.setY((click_position.x - left_most) / length * 15.f);
@@ -390,17 +407,12 @@ int start_menu(RenderWindow& window, Font& font)
 
     for (int i = 0; i < 3; i++)
     {
-        buttons[i].rect.setSize(Vector2f(600.f, 150.f));
-        buttons[i].rect.setOrigin(300.f, 75.f);
+        buttons[i].rect = CreateRectangle(600.f, 150.f, Color::White);
 
-        buttons[i].text.setFont(font);
-        buttons[i].text.setCharacterSize(28);
-        FloatRect bounds = buttons[i].text.getLocalBounds();
-        buttons[i].text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+        InitText(buttons[i].text, font, 28, Color::Black);
     }
 
     buttons[0].rect.setFillColor(Color::Green);
-    buttons[0].text.setFillColor(Color::Black);
     buttons[0].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f - 300.f));
     buttons[0].text.setPosition(buttons[0].rect.getPosition());
 
@@ -410,7 +422,6 @@ int start_menu(RenderWindow& window, Font& font)
     buttons[1].text.setPosition(buttons[1].rect.getPosition());
 
     buttons[2].rect.setFillColor(Color::Red);
-    buttons[2].text.setFillColor(Color::Black);
     buttons[2].rect.setPosition(Vector2f(window.getSize().x / 2.f, window.getSize().y / 2.f + 300.f));
     buttons[2].text.setPosition(buttons[2].rect.getPosition());
 
@@ -487,8 +498,6 @@ int main()
     Vector2D acceleration(0.f, 10.f); // gravity 
     int collision_detection = 1; // 1 for brute force, 2 for tree (experimental).
     int option = start_menu(window, font);
-    Clock time;
-    
     while (option != 2)
     {
         option = start_menu(window, font);
@@ -503,25 +512,22 @@ int main()
         }
     }
     
+    Clock time;
+    vector<Particle> particles;
     Button buttons[3];
     RectangleShape sim_boundary; // Box where the particles will be simulated.
     bool create_particle = false; // When Create Particle Button is pressed, this will be true
     bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
     Text frames;
-    
-    frames.setFillColor(Color::Black);
-    frames.setFont(font);
-    frames.setCharacterSize(28);
-    FloatRect bounds = frames.getLocalBounds();
-    frames.setOrigin(bounds.left + bounds.width / 2.f, bounds.top + bounds.height / 2.f);
-    frames.setPosition(window.getSize().x * 0.87f, window.getSize().y * 0.01f);
 
-    sim_boundary.setFillColor(Color::White);
+    frames = CreateText("FPS: ", font, 28, Color::Black);
+
+    frames.setPosition(window.getSize().x * 0.88f, window.getSize().y * 0.02f);
+    
+    sim_boundary = CreateRectangle(window.getSize().x * 0.70f, window.getSize().y - 15.f, Color::White);
+    
     sim_boundary.setOutlineThickness(10.f);
     sim_boundary.setOutlineColor(Color::Cyan);
-
-    sim_boundary.setSize(Vector2f(window.getSize().x * 0.70f, window.getSize().y - 15.f));
-    sim_boundary.setOrigin(sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f);
     sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
 
 
@@ -530,32 +536,22 @@ int main()
     buttons[2].text.setString("Exit");
     
     for (int i = 0; i < 3; i++)
-    {
-        buttons[i].rect.setSize(Vector2f(400.f, 150.f));
-        buttons[i].rect.setOrigin(buttons[i].rect.getSize().x / 2.f, buttons[i].rect.getSize().y / 2.f);
+    {   
+        buttons[i].rect = CreateRectangle(400.f, 150.f, Color::Red);
         
-        buttons[i].text.setFillColor(Color::Black);
-        buttons[i].text.setFont(font);
-        buttons[i].text.setCharacterSize(28);
-        FloatRect bounds = buttons[i].text.getLocalBounds();
-        buttons[i].text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+        InitText(buttons[i].text, font, 28, Color::Black);
     }
 
     buttons[0].rect.setFillColor(Color::Green);
-    buttons[1].rect.setFillColor(Color::Red);
-    buttons[2].rect.setFillColor(Color::Red);
 
     buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
     buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.8f);
+    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
 
     buttons[0].text.setPosition(buttons[0].rect.getPosition());
     buttons[1].text.setPosition(buttons[1].rect.getPosition());
     buttons[2].text.setPosition(buttons[2].rect.getPosition());
     
-
-    vector<Particle> particles;
-
     while (window.isOpen())
     {
         float delta_time = time.getElapsedTime().asSeconds();
@@ -582,7 +578,7 @@ int main()
     
                     buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
                     buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-                    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.8f);
+                    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
     
                     buttons[0].text.setPosition(buttons[0].rect.getPosition());
                     buttons[1].text.setPosition(buttons[1].rect.getPosition());
@@ -646,34 +642,98 @@ int main()
     
             if (create_particle)
             {
-                Button create;
+                Button text_boxes[3];
+                RectangleShape lines[2];
+                RectangleShape draggables[2];
+                float mass = 1.f;
+                float radius = 0.f;
+
+                text_boxes[0].rect = CreateRectangle(450.f, 150.f, Color::Green);
+                text_boxes[2].rect = CreateRectangle(400.f, 150.f, Color(180,180,180));
+                text_boxes[1].rect = CreateRectangle(400.f, 150.f, Color(180,180,180));
+
+                text_boxes[0].text = CreateText("Click In the Simulation Box \n   To Create the Particle",
+                                            font, 25, Color::Black);
+                text_boxes[1].text = CreateText("Radius: " + to_string(radius), font, 24, Color::Black);
+                text_boxes[2].text = CreateText("Mass: " + to_string(mass), font, 24, Color::Black);
+
+                text_boxes[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.10f);
+                text_boxes[0].text.setPosition(text_boxes[0].rect.getPosition());
                 
-                create.rect.setSize(Vector2f(450.f,150.f));
-                create.rect.setOrigin(create.rect.getSize().x / 2.f, create.rect.getSize().y / 2.f);
-                create.rect.setFillColor(Color::Green);
-    
-                create.text.setString("Create Particle");
-                create.text.setFont(font);
-                create.text.setCharacterSize(28);
-                create.text.setFillColor(Color::Black);
-                FloatRect bounds = create.text.getLocalBounds();
-                create.text.setOrigin(bounds.width / 2.f + bounds.left, bounds.top + bounds.height / 2.f);
+                text_boxes[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+                text_boxes[1].text.setPosition(text_boxes[1].rect.getPosition());
                 
-                create.rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.10f);
-                create.text.setPosition(create.rect.getPosition());
-    
-                window.draw(create.rect);
-                window.draw(create.text);
-    
+                text_boxes[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.65f);
+                text_boxes[2].text.setPosition(text_boxes[2].rect.getPosition());
+
+                for (int i = 0; i < 2; i++)
+                {
+                    lines[i] = CreateRectangle(window.getSize().x * 0.2, 15.f, Color::Black);
+                    draggables[2] = CreateRectangle(20.f, 70.f, Color::White);
+                }
+
+                lines[0].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.48f);
+                lines[1].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.78f);
+                
+                // float right_most = lines[0].getPosition().x + lines[0].getSize().x / 2.f;
+                // float left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
+                // float length = right_most - left_most;
+                
+                // draggables[0].setPosition(left_most + radius / 25.f * length, window.getSize().y * 0.475f);
+                // draggables[1].setPosition(left_most + mass / 100.f * length, window.getSize().y * 0.775f);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    window.draw(lines[i]);
+                    // window.draw(draggables[i]);
+                }
+
+                for (int i = 0; i < 3; i++)
+                {
+                    window.draw(text_boxes[i].rect);
+                    window.draw(text_boxes[i].text);
+                }
+                    
                 if (Mouse::isButtonPressed(Mouse::Left))
                 {
                     Vector2i click_position = Mouse::getPosition(window);
-                    if (ButtonPressed(create, click_position.x, click_position.y))
-                    {
-                        Particle to_create(Vector2D(), 10.f, 10.f);
-                            
-                        create_particle = false;
-                    }
+                    // if (click_position.x >= )
+                    //     Particle to_create(Vector2D(), 10.f, 10.f);
+                    // if (ButtonPressed(draggables[0], click_position.x, click_position.y)
+                    // || ButtonPressed(lines[0], click_position.x, click_position.y)
+                    // )
+                    // {
+                    //     draggables[0].setPosition(click_position.x, window.getSize().y * 0.475f);
+
+                    //     if (draggables[0].getPosition().x >= right_most)
+                    //     {
+                    //         draggables[0].setPosition(right_most, window.getSize().y * 0.475f);
+                    //     }
+                    //     else if (draggables[0].getPosition().x <= left_most)
+                    //     {
+                    //         draggables[0].setPosition(left_most, window.getSize().y * 0.475f);
+                    //     }
+
+                    //     text_boxes[1].text.setString("Radius: " + to_string(radius));
+                    // }
+                    // else if (ButtonPressed(draggables[1], click_position.x, click_position.y)
+                    // || ButtonPressed(lines[1], click_position.x, click_position.y)
+                    //         )
+                    // {
+                    //         draggables[1].setPosition(click_position.x, window.getSize().y * 0.775);
+
+                    //         if (draggables[1].getPosition().x >= right_most)
+                    //         {
+                    //             draggables[1].setPosition(right_most, window.getSize().y * 0.775);
+                    //         }
+                    //         else if (draggables[1].getPosition().x <= left_most)
+                    //         {
+                    //             draggables[1].setPosition(left_most, window.getSize().y * 0.775);
+                    //         }
+
+                    //         text_boxes[2].text.setString("Mass: " + to_string(mass));
+                    // }
+                    create_particle = false;
                 }
             }
     
@@ -749,8 +809,7 @@ int main()
                     }
                 }
             }
-    
-    
+
             window.display();
         }
     }
