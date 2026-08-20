@@ -29,9 +29,6 @@ class Particle
         // Returns the mass of the Particle
         float getMass() const;
 
-        // Returns whether or not rendering *this is required
-        bool getRender() const;
-
         // Returns the Position of the Particle
         sf::Vector2f getPosition() const;
         
@@ -39,10 +36,6 @@ class Particle
         // to_vel is the new velocity
         void setVelocity(const Vector2D& to_vel);  
         
-        // Sets the render member of the Particle.
-        // to_render is the new render
-        void setRender(const bool& to_render);
-
         // Sets the position of the Particle's Object
         void setPosition(const sf::Vector2f& pos);
         
@@ -59,7 +52,6 @@ class Particle
         Vector2D velocity;
         sf::CircleShape object;
         float mass;
-        bool render;
 };
 
 

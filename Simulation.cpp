@@ -502,9 +502,20 @@ int main()
             settings_menu(window, font, acceleration, collision_detection);
         }
     }
-
-    RectangleShape sim_boundary; // Box where the particles will be simulated.
     
+    Button buttons[3];
+    RectangleShape sim_boundary; // Box where the particles will be simulated.
+    bool create_particle = false; // When Create Particle Button is pressed, this will be true
+    bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
+    Text frames;
+    
+    frames.setFillColor(Color::Black);
+    frames.setFont(font);
+    frames.setCharacterSize(28);
+    FloatRect bounds = frames.getLocalBounds();
+    frames.setOrigin(bounds.left + bounds.width / 2.f, bounds.top + bounds.height / 2.f);
+    frames.setPosition(window.getSize().x * 0.87f, window.getSize().y * 0.01f);
+
     sim_boundary.setFillColor(Color::White);
     sim_boundary.setOutlineThickness(10.f);
     sim_boundary.setOutlineColor(Color::Cyan);
@@ -513,7 +524,6 @@ int main()
     sim_boundary.setOrigin(sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f);
     sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
 
-    Button buttons[3];
 
     buttons[0].text.setString("Create Particle");
     buttons[1].text.setString("Delete Particle");
@@ -542,18 +552,19 @@ int main()
     buttons[0].text.setPosition(buttons[0].rect.getPosition());
     buttons[1].text.setPosition(buttons[1].rect.getPosition());
     buttons[2].text.setPosition(buttons[2].rect.getPosition());
-
-    bool create_particle = false; // When Create Particle Button is pressed, this will be true
-    bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
+    
 
     vector<Particle> particles;
 
     while (window.isOpen())
     {
         float delta_time = time.getElapsedTime().asSeconds();
-        if (delta_time >= 1.f / 60.f)
+        if (delta_time >= 1.f / 30.f)
         {
-            
+            time.restart();
+            float fps = 1 / delta_time;
+            frames.setString("FPS: " + to_string(fps));
+
             Event event;
             while (window.pollEvent(event))
             {
@@ -579,23 +590,32 @@ int main()
                 }
             }
     
-    
             for (int i = 0; i < particles.size(); i++)
             {
-    
+                particles[i].Update_Velocity(delta_time, acceleration);
+                particles[i].Update_Position(delta_time, acceleration);
             }
-    
-    
+            
+            if (particles.size())
+            {
+                if (collision_detection == 1)
+                {
+                    brute_force(particles);
+                }
+                // else 
+                // {
+
+                // }
+            }
+
             window.clear(Color(170,170,170));
     
             window.draw(sim_boundary);
+            window.draw(frames);
     
             for (int i = 0; i < particles.size(); i++)
             {
-                if (particles[i].getRender())
-                {
-                    window.draw(particles[i].getObject());
-                }
+                window.draw(particles[i].getObject());
             }
             
             if (create_particle == false && delete_particle == false)
@@ -719,14 +739,10 @@ int main()
                         Vector2i click_position = Mouse::getPosition(window);
                         for (int i = 0; i < particles.size(); i++)
                         {
-                            if (!particles[i].getRender())
-                            {
-                                continue;
-                            }
-                            
                             if (ParticleClicked(particles[i], click_position))
                             {
-                                particles[i].setRender(false);
+                                auto it = particles.begin() + i;
+                                particles.erase(it);
                                 delete_particle = false;
                             }
                         }   

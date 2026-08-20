@@ -11,10 +11,6 @@ using namespace sf;
 // detects a collision between a particle and the walls of the simulation
 void Naive_Collisions::detect_resolve(Particle& A, float boundaries[4])
 {   
-    if (A.getRender() == false)
-    {
-        return;
-    }
     Vector2D pos = A.getObject().getPosition();
     float radius = A.getObject().getRadius();
     Vector2D vel = A.getVelocity();
@@ -63,10 +59,6 @@ void Naive_Collisions::detect_resolve(Particle& A, float boundaries[4])
 // Function that detects a collision between Particles A and B.
 bool Naive_Collisions::detect(const Particle& A,const Particle& B)
 {
-    if (!A.getRender() || !B.getRender())
-    {
-        return false; // Either Particles not being rendered, so no point wasting computations.
-    }
     Vector2D p1 = A.getObject().getPosition();
     Vector2D p2 = B.getObject().getPosition();
     float A_radius = A.getObject().getRadius();

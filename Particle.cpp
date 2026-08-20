@@ -56,22 +56,11 @@ Vector2f Particle::getPosition() const
     return this->object.getPosition();
 }
 
-// Returns whether or not rendering *this is required
-bool Particle::getRender() const
-{
-    return this->render;
-}
-
 // Sets the Velocity of the Particle
 // to_vel is the new velocity
 void Particle::setVelocity(const Vector2D& to_vel)
 {
     this->velocity = to_vel;
-}
-
-void Particle::setRender(const bool& to_render)
-{
-    this->render = to_render;
 }
 
 void Particle::setPosition(const Vector2f& pos)
