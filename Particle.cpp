@@ -51,6 +51,11 @@ float Particle::getMass() const
     return this->mass;
 }
 
+Vector2f Particle::getPosition() const
+{
+    return this->object.getPosition();
+}
+
 // Returns whether or not rendering *this is required
 bool Particle::getRender() const
 {
@@ -67,6 +72,11 @@ void Particle::setVelocity(const Vector2D& to_vel)
 void Particle::setRender(const bool& to_render)
 {
     this->render = to_render;
+}
+
+void Particle::setPosition(const Vector2f& pos)
+{
+    this->object.setPosition(pos);
 }
 
 // Moves the Particle as described by its velocity, changes object's position in place

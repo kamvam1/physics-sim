@@ -31,6 +31,9 @@ class Particle
 
         // Returns whether or not rendering *this is required
         bool getRender() const;
+
+        // Returns the Position of the Particle
+        Vector2f getPosition() const;
         
         // Sets the Velocity of the Particle
         // to_vel is the new velocity
@@ -39,6 +42,9 @@ class Particle
         // Sets the render member of the Particle.
         // to_render is the new render
         void setRender(const bool& to_render);
+
+        // Sets the position of the Particle's Object
+        void setPosition(const Vector2f& pos);
         
         // Moves the Particle as described by its velocity, changes object's position in place
         // Takes in delta_time which is seconds per frame to compute distance moved.
