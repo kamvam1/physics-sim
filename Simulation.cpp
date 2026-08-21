@@ -70,6 +70,26 @@ bool ParticleClicked(const Particle& p,const Vector2i& click_position)
     return false;
 }
 
+// Makes sure there isnt a Particle where the user clicked 
+bool ParticleObstructionCheck(float radius_B, vector<Particle>& particles, float x_pos, float y_pos)
+{
+    for (int i = 0; i < particles.size(); i++)
+    {
+        CircleShape obj = particles[i].getObject();
+        float radius_A = obj.getRadius();
+    
+        float dist_x = max(x_pos,obj.getPosition().x) - min(x_pos, obj.getPosition().x);
+        float dist_y = max(y_pos,obj.getPosition().y) - min(y_pos, obj.getPosition().y);
+
+        if (dist_x <= radius_A + radius_B && dist_y <= radius_A + radius_B)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // Checks whether the user pressed a button in the simulation
 // x_pos and y_pos are both positions where the mouse click happened.
 bool ButtonPressed(Button b, float x_pos, float y_pos)
@@ -128,13 +148,11 @@ void brute_force(vector<Particle>& particles)
 
     for (int i = 0; i < particles.size() - 1; i++)
     {
-        Particle A = particles[i];
         for (int j = i + 1; j < particles.size(); j++)
         {
-            Particle B = particles[j];
-            if (physics.detect(A, B))
+            if (physics.detect(particles[i], particles[j]))
             {
-                physics.resolve(A, B);
+                physics.resolve(particles[i], particles[j]);
             }
         }
     }
@@ -607,7 +625,7 @@ int main()
                 {
                     brute_force(particles);
                 }
-                // else 
+                // else if (collision_detection == 2)
                 // {
                     
                 // }
@@ -742,7 +760,8 @@ int main()
                         text_boxes[2].text.setString("Mass: " + to_string(mass));
                     }
                     else if ((click_position.x >= radius && click_position.x <= sim_boundary.getSize().x - radius)
-                    && (click_position.y >= radius && click_position.y <= sim_boundary.getSize().y))
+                    && (click_position.y >= radius && click_position.y <= sim_boundary.getSize().y)
+                    &&  !ParticleObstructionCheck(radius, particles, click_position.x, click_position.y))
                     {
                         Particle to_create(Vector2D(0.f,0.f), radius, mass);
                         to_create.setPosition(Vector2f(click_position.x, click_position.y));
