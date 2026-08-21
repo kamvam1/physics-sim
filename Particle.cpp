@@ -68,6 +68,11 @@ void Particle::setPosition(const Vector2f& pos)
     this->object.setPosition(pos);
 }
 
+void Particle::setColor(const Color& fill_color)
+{
+    this->object.setFillColor(fill_color);
+}
+
 // Moves the Particle as described by its velocity, changes object's position in place
 // Takes in delta_time which is seconds per frame to compute distance moved.
 void Particle::Update_Position(const float delta_time, const Vector2D acceleration)
@@ -87,15 +92,15 @@ void Particle::Update_Velocity(const float delta_time, const Vector2D accelerati
 {
     Vector2D delta_vel = acceleration * delta_time;
     this->velocity += delta_vel;
-    if (abs(this->velocity.getX()) >= 50.f)
-    {
-        float limit = copysign(50.f, this->velocity.getX());
-        this->velocity.setX(limit); // Limiting X component to not cause rendering problems
-    }
+    // if (abs(this->velocity.getX()) >= 50.f)
+    // {
+    //     float limit = copysign(50.f, this->velocity.getX());
+    //     this->velocity.setX(limit); // Limiting X component to not cause rendering problems
+    // }
 
-    if (abs(this->velocity.getY()) >= 50.f)
-    {
-        float limit = copysign(50.f, this->velocity.getY());
-        this->velocity.setY(limit); // Limiting Y component to not cause rendering problems
-    }
+    // if (abs(this->velocity.getY()) >= 50.f)
+    // {
+    //     float limit = copysign(50.f, this->velocity.getY());
+    //     this->velocity.setY(limit); // Limiting Y component to not cause rendering problems
+    // }
 }

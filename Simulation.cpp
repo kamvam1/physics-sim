@@ -243,8 +243,8 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     float left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
     float length = right_most - left_most;
     
-    draggables[0].setPosition(left_most + acceleration.getX() / 15.f * length, window.getSize().y / 5.f);
-    draggables[1].setPosition(left_most + acceleration.getY() / 15.f * length, window.getSize().y / 5.f + 350.f);
+    draggables[0].setPosition(left_most + acceleration.getX() / 30.f * length, window.getSize().y / 5.f);
+    draggables[1].setPosition(left_most + acceleration.getY() / 30.f * length, window.getSize().y / 5.f + 350.f);
 
     while (window.isOpen())
     {
@@ -323,7 +323,7 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
             {
                 draggables[0].setPosition(click_position.x, window.getSize().y / 5.f);
                 
-                acceleration.setX((click_position.x - left_most) / length * 15.f);
+                acceleration.setX((click_position.x - left_most) / length * 30.f);
 
                 acc_x = to_string(acceleration.getX());
 
@@ -348,7 +348,7 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
             {
                 draggables[1].setPosition(click_position.x, window.getSize().y / 5.f + 350.f);
                 
-                acceleration.setY((click_position.x - left_most) / length * 15.f);
+                acceleration.setY((click_position.x - left_most) / length * 30.f);
                 
                 acc_y = to_string(acceleration.getY());
                 
@@ -495,7 +495,7 @@ int main()
         return -1;
     }   
 
-    Vector2D acceleration(0.f, 10.f); // gravity 
+    Vector2D acceleration(0.f, 15.f); // gravity 
     int collision_detection = 1; // 1 for brute force, 2 for tree (experimental).
     int option = start_menu(window, font);
     while (option != 2)
@@ -519,7 +519,11 @@ int main()
     bool create_particle = false; // When Create Particle Button is pressed, this will be true
     bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
     Text frames;
+    float mass = 1.f;
+    float radius = 1.f;
+    Naive_Collisions physics;
 
+    
     frames = CreateText("FPS: ", font, 28, Color::Black);
 
     frames.setPosition(window.getSize().x * 0.88f, window.getSize().y * 0.02f);
@@ -529,7 +533,12 @@ int main()
     sim_boundary.setOutlineThickness(10.f);
     sim_boundary.setOutlineColor(Color::Cyan);
     sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
-
+    
+    float boundaries[4];
+    boundaries[0] = sim_boundary.getOrigin().y - sim_boundary.getSize().y / 2.f + 10.f;
+    boundaries[1] = sim_boundary.getOrigin().x + sim_boundary.getSize().x / 2.f + 10.f;
+    boundaries[2] = sim_boundary.getOrigin().y + sim_boundary.getSize().y / 2.f + 5.f;
+    boundaries[3] = sim_boundary.getOrigin().x - sim_boundary.getSize().x / 2.f + 10.f;
 
     buttons[0].text.setString("Create Particle");
     buttons[1].text.setString("Delete Particle");
@@ -552,6 +561,8 @@ int main()
     buttons[1].text.setPosition(buttons[1].rect.getPosition());
     buttons[2].text.setPosition(buttons[2].rect.getPosition());
     
+    window.setTitle("Simulation");
+
     while (window.isOpen())
     {
         float delta_time = time.getElapsedTime().asSeconds();
@@ -592,23 +603,29 @@ int main()
                 particles[i].Update_Position(delta_time, acceleration);
             }
             
+            // if (particles.size() > 1)
+            // {
+            //     if (collision_detection == 1)
+            //     {
+            //         brute_force(particles);
+            //     }
+            //     // else 
+            //     // {
+                    
+            //     // }
+            // }
+            
             if (particles.size())
             {
-                if (collision_detection == 1)
-                {
-                    brute_force(particles);
-                }
-                // else 
-                // {
-
-                // }
+                boundary_collision(particles, boundaries);
             }
 
             window.clear(Color(170,170,170));
     
             window.draw(sim_boundary);
+            
             window.draw(frames);
-    
+            
             for (int i = 0; i < particles.size(); i++)
             {
                 window.draw(particles[i].getObject());
@@ -621,7 +638,7 @@ int main()
                     window.draw(buttons[i].rect);
                     window.draw(buttons[i].text);
                 }
-    
+                
                 if (Mouse::isButtonPressed(Mouse::Left))
                 {
                     Vector2i click_position = Mouse::getPosition(window);
@@ -645,12 +662,10 @@ int main()
                 Button text_boxes[3];
                 RectangleShape lines[2];
                 RectangleShape draggables[2];
-                float mass = 1.f;
-                float radius = 0.f;
 
                 text_boxes[0].rect = CreateRectangle(450.f, 150.f, Color::Green);
-                text_boxes[2].rect = CreateRectangle(400.f, 150.f, Color(180,180,180));
                 text_boxes[1].rect = CreateRectangle(400.f, 150.f, Color(180,180,180));
+                text_boxes[2].rect = CreateRectangle(400.f, 150.f, Color(180,180,180));
 
                 text_boxes[0].text = CreateText("Click In the Simulation Box \n   To Create the Particle",
                                             font, 25, Color::Black);
@@ -665,75 +680,93 @@ int main()
                 
                 text_boxes[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.65f);
                 text_boxes[2].text.setPosition(text_boxes[2].rect.getPosition());
+                
+                float length = window.getSize().x * 0.2;
 
                 for (int i = 0; i < 2; i++)
                 {
-                    lines[i] = CreateRectangle(window.getSize().x * 0.2, 15.f, Color::Black);
-                    draggables[2] = CreateRectangle(20.f, 70.f, Color::White);
+                    lines[i] = CreateRectangle(length, 15.f, Color::Black);
+                    draggables[i] = CreateRectangle(20.f, 70.f, Color::White);
                 }
 
-                lines[0].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.48f);
-                lines[1].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.78f);
+                lines[0].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.475f);
+                lines[1].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.775f);
                 
-                // float right_most = lines[0].getPosition().x + lines[0].getSize().x / 2.f;
-                // float left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
-                // float length = right_most - left_most;
+                float right_most = lines[0].getPosition().x + lines[0].getSize().x / 2.f;
+                float left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
                 
-                // draggables[0].setPosition(left_most + radius / 25.f * length, window.getSize().y * 0.475f);
-                // draggables[1].setPosition(left_most + mass / 100.f * length, window.getSize().y * 0.775f);
+                draggables[0].setPosition(left_most + (radius - 1.f)/ (70.f - 1.f) * length, window.getSize().y * 0.475f);
+                draggables[1].setPosition(left_most + (mass - 1.f) / (100.f - 1.f) * length, window.getSize().y * 0.775f);
 
-                for (int i = 0; i < 2; i++)
+                if (Mouse::isButtonPressed(Mouse::Left))
                 {
-                    window.draw(lines[i]);
-                    // window.draw(draggables[i]);
-                }
+                    Vector2i click_position = Mouse::getPosition(window);
+                    if (ButtonPressed(draggables[0], click_position.x, click_position.y)
+                    || ButtonPressed(lines[0], click_position.x, click_position.y)
+                        )
+                    {
+                        draggables[0].setPosition(click_position.x, window.getSize().y * 0.475f);
+                        
+                        radius = (click_position.x - left_most) / length * 70.f;
+                        
+                        if (draggables[0].getPosition().x >= right_most)
+                        {
+                            draggables[0].setPosition(right_most, window.getSize().y * 0.475f);
+                            radius = 70.f;
+                        }
+                        else if (draggables[0].getPosition().x <= left_most)
+                        {
+                            draggables[0].setPosition(left_most, window.getSize().y * 0.475f);
+                            radius = 1.f;
+                        }
 
+                        text_boxes[1].text.setString("Radius: " + to_string(radius));
+                    }
+                    else if (ButtonPressed(draggables[1], click_position.x, click_position.y)
+                    || ButtonPressed(lines[1], click_position.x, click_position.y)
+                            )
+                    {
+                        draggables[1].setPosition(click_position.x, window.getSize().y * 0.775);
+
+                        mass = (click_position.x - left_most) / length * 100.f;
+
+                        if (draggables[1].getPosition().x >= right_most)
+                        {
+                            draggables[1].setPosition(right_most, window.getSize().y * 0.775);
+                            mass = 100.f;
+                        }
+                        else if (draggables[1].getPosition().x <= left_most)
+                        {
+                            draggables[1].setPosition(left_most, window.getSize().y * 0.775);
+                            mass = 1.f;
+                        }
+                        
+                        text_boxes[2].text.setString("Mass: " + to_string(mass));
+                    }
+                    else if ((click_position.x >= radius && click_position.x <= sim_boundary.getSize().x - radius)
+                    && (click_position.y >= radius && click_position.y <= sim_boundary.getSize().y))
+                    {
+                        Particle to_create(Vector2D(0.f,0.f), radius, mass);
+                        to_create.setPosition(Vector2f(click_position.x, click_position.y));
+                        int red = rand() % 255 + 10;
+                        int green = rand() % 255 + 10;
+                        int blue = rand() % 255 + 10;
+                        to_create.setColor(Color(red,green,blue));
+                        particles.push_back(to_create);
+                        create_particle = false;
+                    }
+                }
+                
                 for (int i = 0; i < 3; i++)
                 {
                     window.draw(text_boxes[i].rect);
                     window.draw(text_boxes[i].text);
                 }
-                    
-                if (Mouse::isButtonPressed(Mouse::Left))
+
+                for (int i = 0; i < 2; i++)
                 {
-                    Vector2i click_position = Mouse::getPosition(window);
-                    // if (click_position.x >= )
-                    //     Particle to_create(Vector2D(), 10.f, 10.f);
-                    // if (ButtonPressed(draggables[0], click_position.x, click_position.y)
-                    // || ButtonPressed(lines[0], click_position.x, click_position.y)
-                    // )
-                    // {
-                    //     draggables[0].setPosition(click_position.x, window.getSize().y * 0.475f);
-
-                    //     if (draggables[0].getPosition().x >= right_most)
-                    //     {
-                    //         draggables[0].setPosition(right_most, window.getSize().y * 0.475f);
-                    //     }
-                    //     else if (draggables[0].getPosition().x <= left_most)
-                    //     {
-                    //         draggables[0].setPosition(left_most, window.getSize().y * 0.475f);
-                    //     }
-
-                    //     text_boxes[1].text.setString("Radius: " + to_string(radius));
-                    // }
-                    // else if (ButtonPressed(draggables[1], click_position.x, click_position.y)
-                    // || ButtonPressed(lines[1], click_position.x, click_position.y)
-                    //         )
-                    // {
-                    //         draggables[1].setPosition(click_position.x, window.getSize().y * 0.775);
-
-                    //         if (draggables[1].getPosition().x >= right_most)
-                    //         {
-                    //             draggables[1].setPosition(right_most, window.getSize().y * 0.775);
-                    //         }
-                    //         else if (draggables[1].getPosition().x <= left_most)
-                    //         {
-                    //             draggables[1].setPosition(left_most, window.getSize().y * 0.775);
-                    //         }
-
-                    //         text_boxes[2].text.setString("Mass: " + to_string(mass));
-                    // }
-                    create_particle = false;
+                    window.draw(lines[i]);
+                    window.draw(draggables[i]);
                 }
             }
     
@@ -809,7 +842,7 @@ int main()
                     }
                 }
             }
-
+            
             window.display();
         }
     }
