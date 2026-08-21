@@ -129,7 +129,7 @@ void brute_force(vector<Particle>& particles)
     for (int i = 0; i < particles.size() - 1; i++)
     {
         Particle A = particles[i];
-        for (int j = i + 1; j < particles.size(); i++)
+        for (int j = i + 1; j < particles.size(); j++)
         {
             Particle B = particles[j];
             if (physics.detect(A, B))
@@ -521,9 +521,7 @@ int main()
     Text frames;
     float mass = 1.f;
     float radius = 1.f;
-    Naive_Collisions physics;
 
-    
     frames = CreateText("FPS: ", font, 28, Color::Black);
 
     frames.setPosition(window.getSize().x * 0.88f, window.getSize().y * 0.02f);
@@ -603,17 +601,17 @@ int main()
                 particles[i].Update_Position(delta_time, acceleration);
             }
             
-            // if (particles.size() > 1)
-            // {
-            //     if (collision_detection == 1)
-            //     {
-            //         brute_force(particles);
-            //     }
-            //     // else 
-            //     // {
+            if (particles.size() > 1)
+            {
+                if (collision_detection == 1)
+                {
+                    brute_force(particles);
+                }
+                // else 
+                // {
                     
-            //     // }
-            // }
+                // }
+            }
             
             if (particles.size())
             {

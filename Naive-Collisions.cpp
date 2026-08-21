@@ -3,7 +3,7 @@
 #include "Vector2D.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Vector2.hpp>
-
+#include <iostream>
 using namespace std;
 using namespace sf;
 
@@ -76,12 +76,15 @@ bool Naive_Collisions::detect(const Particle& A,const Particle& B)
 // Handles the post collision velocities
 void Naive_Collisions::resolve(Particle& A, Particle& B)
 {
+    Vector2D A_pos = A.getObject().getPosition();
+    Vector2D B_pos = B.getObject().getPosition();
+
     // Line of impact for A and B, specifically from A to B
-    Vector2D normalBA = B.getObject().getPosition() - A.getObject().getPosition(); 
+    Vector2D normalBA = B_pos - A_pos; 
     normalBA = normalBA.Normalize();
     
     // Line of impact from B to A
-    Vector2D normalAB = A.getObject().getPosition() - B.getObject().getPosition();
+    Vector2D normalAB = A_pos - B_pos;
     normalAB = normalAB.Normalize();
 
     // initial velocity of A
