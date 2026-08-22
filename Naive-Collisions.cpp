@@ -63,6 +63,18 @@ bool Naive_Collisions::detect(const Particle& A,const Particle& B)
     Vector2D p2 = B.getObject().getPosition();
     float A_radius = A.getObject().getRadius();
     float B_radius = B.getObject().getRadius();
+
+    Vector2D normalBA = p2 - p1;
+    normalBA = normalBA.Normalize();
+
+    Vector2D normalAB = p1 - p2;
+    normalAB = normalAB.Normalize();
+
+    Vector2D A_vel = A.getVelocity();
+    Vector2D B_vel = B.getVelocity();
+
+    float dot_A = A_vel.Dot(normalBA);
+    float dot_B = B_vel.Dot(normalAB);
     
     float dist = p1.Dist(p2);
     if (A_radius + B_radius < dist)
@@ -70,7 +82,12 @@ bool Naive_Collisions::detect(const Particle& A,const Particle& B)
         return false;
     }
 
-    return true;
+    if (dot_A > 0 || dot_B > 0 )
+    {    
+        return true;
+    }
+
+    return false;
 }
 
 // Handles the post collision velocities
