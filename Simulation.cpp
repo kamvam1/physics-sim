@@ -537,11 +537,14 @@ int main()
     bool create_particle = false; // When Create Particle Button is pressed, this will be true
     bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
     Text frames;
+    Text particle_count;
     float mass = 1.f;
     float radius = 1.f;
 
+    particle_count = CreateText("Particle Count: " + to_string(particles.size()), font, 25, Color::Black);
     frames = CreateText("FPS: ", font, 28, Color::Black);
 
+    particle_count.setPosition(window.getSize().x * 0.075f, window.getSize().y * 0.02f);
     frames.setPosition(window.getSize().x * 0.88f, window.getSize().y * 0.02f);
     
     sim_boundary = CreateRectangle(window.getSize().x * 0.70f, window.getSize().y - 15.f, Color::White);
@@ -587,6 +590,7 @@ int main()
             time.restart();
             float fps = 1 / delta_time;
             frames.setString("FPS: " + to_string(fps));
+            particle_count.setString("Particle Count: " + to_string(particles.size()));
 
             Event event;
             while (window.pollEvent(event))
@@ -602,6 +606,15 @@ int main()
                     window.setView(view);
     
                     sim_boundary.setSize(Vector2f(window.getSize().x * 0.70f, window.getSize().y - 15.f));
+                    sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
+
+                    boundaries[0] = sim_boundary.getOrigin().y - sim_boundary.getSize().y / 2.f + 10.f;
+                    boundaries[1] = sim_boundary.getOrigin().x + sim_boundary.getSize().x / 2.f + 10.f;
+                    boundaries[2] = sim_boundary.getOrigin().y + sim_boundary.getSize().y / 2.f + 5.f;
+                    boundaries[3] = sim_boundary.getOrigin().x - sim_boundary.getSize().x / 2.f + 10.f;
+
+                    particle_count.setPosition(window.getSize().x * 0.075f, window.getSize().y * 0.02f);
+                    frames.setPosition(window.getSize().x * 0.88f, window.getSize().y * 0.02f);
     
                     buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
                     buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
@@ -640,6 +653,7 @@ int main()
     
             window.draw(sim_boundary);
             
+            window.draw(particle_count);
             window.draw(frames);
             
             for (int i = 0; i < particles.size(); i++)
