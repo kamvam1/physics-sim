@@ -5,9 +5,36 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
+#include <chrono>
 
 using namespace sf;
 using namespace std;
+
+// For Performance Measurement
+class Timer
+{
+    public:
+        Timer()
+        {
+            m_StartTimePoint = chrono::high_resolution_clock::now();
+        }
+
+        long Stop()
+        {
+            auto endTimePoint = chrono::high_resolution_clock::now();
+
+            auto start = chrono::time_point_cast<chrono::microseconds>(this->m_StartTimePoint).time_since_epoch().count();
+            auto end = chrono::time_point_cast<chrono::microseconds>(endTimePoint).time_since_epoch().count();
+
+            auto duration = end - start;
+
+            cout << duration << " us, " << duration * 0.001 << " ms" << endl; 
+
+            return duration;
+        }
+    private:
+        chrono::time_point<chrono::high_resolution_clock> m_StartTimePoint;
+};
 
 struct Button
 {
@@ -503,7 +530,7 @@ int start_menu(RenderWindow& window, Font& font)
 int main()
 {
     RenderWindow window(VideoMode(2000, 1500),"Menu");
-    window.setFramerateLimit(30);
+    window.setFramerateLimit(60);
     
     Font font;
     if (!font.loadFromFile("../fonts/0xProtoNerdFont-Regular.ttf"))
@@ -554,10 +581,10 @@ int main()
     sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
     
     float boundaries[4];
-    boundaries[0] = sim_boundary.getOrigin().y - sim_boundary.getSize().y / 2.f + 10.f;
+    boundaries[0] = 0.0f + 10.f;
     boundaries[1] = sim_boundary.getOrigin().x + sim_boundary.getSize().x / 2.f + 10.f;
     boundaries[2] = sim_boundary.getOrigin().y + sim_boundary.getSize().y / 2.f + 5.f;
-    boundaries[3] = sim_boundary.getOrigin().x - sim_boundary.getSize().x / 2.f + 10.f;
+    boundaries[3] = 0.0f + 10.f;
 
     buttons[0].text.setString("Create Particle");
     buttons[1].text.setString("Delete Particle");
@@ -582,10 +609,13 @@ int main()
     
     window.setTitle("Simulation");
 
+    int iteration = 0;
+    long total_time = 0;
+
     while (window.isOpen())
     {
         float delta_time = time.getElapsedTime().asSeconds();
-        if (delta_time >= 1.f / 30.f)
+        if (delta_time >= 1.f / 60.f)
         {
             time.restart();
             float fps = 1 / delta_time;
@@ -606,13 +636,15 @@ int main()
                     window.setView(view);
     
                     sim_boundary.setSize(Vector2f(window.getSize().x * 0.70f, window.getSize().y - 15.f));
+                    sim_boundary.setOrigin(sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f);
+
                     sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
 
-                    boundaries[0] = sim_boundary.getOrigin().y - sim_boundary.getSize().y / 2.f + 10.f;
+                    boundaries[0] = 0.0f + 10.f;
                     boundaries[1] = sim_boundary.getOrigin().x + sim_boundary.getSize().x / 2.f + 10.f;
                     boundaries[2] = sim_boundary.getOrigin().y + sim_boundary.getSize().y / 2.f + 5.f;
-                    boundaries[3] = sim_boundary.getOrigin().x - sim_boundary.getSize().x / 2.f + 10.f;
-
+                    boundaries[3] = 0.0f + 10.f;
+                    
                     particle_count.setPosition(window.getSize().x * 0.075f, window.getSize().y * 0.02f);
                     frames.setPosition(window.getSize().x * 0.88f, window.getSize().y * 0.02f);
     
@@ -632,7 +664,22 @@ int main()
                 particles[i].Update_Position(delta_time, acceleration);
             }
             
-            if (particles.size() > 1)
+            if (particles.size() >= 100 && iteration < 500)
+            {
+                if (collision_detection == 1)
+                {
+                    Timer t;
+                    cout << "Iteration: " << iteration + 1 << endl;
+                    iteration++;
+                    brute_force(particles);
+                    total_time += t.Stop();
+                }
+                // else if (collision_detection == 2)
+                // {
+                    
+                // }
+            }
+            else if (particles.size() > 1)
             {
                 if (collision_detection == 1)
                 {
@@ -642,6 +689,13 @@ int main()
                 // {
                     
                 // }
+                
+            }
+
+            if (iteration == 500)
+            {
+                cout << "Total: " << total_time << ", Average: " << total_time / 500 << endl;
+                iteration = 501;
             }
             
             if (particles.size())
