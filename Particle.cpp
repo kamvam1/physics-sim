@@ -51,11 +51,26 @@ float Particle::getMass() const
     return this->mass;
 }
 
+Vector2f Particle::getPosition() const
+{
+    return this->object.getPosition();
+}
+
 // Sets the Velocity of the Particle
 // to_vel is the new velocity
 void Particle::setVelocity(const Vector2D& to_vel)
 {
     this->velocity = to_vel;
+}
+
+void Particle::setPosition(const Vector2f& pos)
+{
+    this->object.setPosition(pos);
+}
+
+void Particle::setColor(const Color& fill_color)
+{
+    this->object.setFillColor(fill_color);
 }
 
 // Moves the Particle as described by its velocity, changes object's position in place
@@ -77,15 +92,4 @@ void Particle::Update_Velocity(const float delta_time, const Vector2D accelerati
 {
     Vector2D delta_vel = acceleration * delta_time;
     this->velocity += delta_vel;
-    if (abs(this->velocity.getX()) >= 50.f)
-    {
-        float limit = copysign(50.f, this->velocity.getX());
-        this->velocity.setX(limit); // Limiting X component to not cause rendering problems
-    }
-
-    if (abs(this->velocity.getY()) >= 50.f)
-    {
-        float limit = copysign(50.f, this->velocity.getY());
-        this->velocity.setY(limit); // Limiting Y component to not cause rendering problems
-    }
 }

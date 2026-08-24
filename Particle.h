@@ -28,10 +28,18 @@ class Particle
 
         // Returns the mass of the Particle
         float getMass() const;
+
+        // Returns the Position of the Particle
+        sf::Vector2f getPosition() const;
         
         // Sets the Velocity of the Particle
         // to_vel is the new velocity
-        void setVelocity(const Vector2D& to_vel);                
+        void setVelocity(const Vector2D& to_vel);  
+        
+        // Sets the position of the Particle's Object
+        void setPosition(const sf::Vector2f& pos);
+
+        void setColor(const sf::Color& fill_color);
         
         // Moves the Particle as described by its velocity, changes object's position in place
         // Takes in delta_time which is seconds per frame to compute distance moved.

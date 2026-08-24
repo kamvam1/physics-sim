@@ -3,14 +3,14 @@
 #include "Vector2D.h"
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Vector2.hpp>
-
+#include <iostream>
 using namespace std;
 using namespace sf;
 
 
 // detects a collision between a particle and the walls of the simulation
 void Naive_Collisions::detect_resolve(Particle& A, float boundaries[4])
-{
+{   
     Vector2D pos = A.getObject().getPosition();
     float radius = A.getObject().getRadius();
     Vector2D vel = A.getVelocity();
@@ -63,6 +63,18 @@ bool Naive_Collisions::detect(const Particle& A,const Particle& B)
     Vector2D p2 = B.getObject().getPosition();
     float A_radius = A.getObject().getRadius();
     float B_radius = B.getObject().getRadius();
+
+    Vector2D normalBA = p2 - p1;
+    normalBA = normalBA.Normalize();
+
+    Vector2D normalAB = p1 - p2;
+    normalAB = normalAB.Normalize();
+
+    Vector2D A_vel = A.getVelocity();
+    Vector2D B_vel = B.getVelocity();
+
+    float dot_A = A_vel.Dot(normalBA);
+    float dot_B = B_vel.Dot(normalAB);
     
     float dist = p1.Dist(p2);
     if (A_radius + B_radius < dist)
@@ -70,18 +82,26 @@ bool Naive_Collisions::detect(const Particle& A,const Particle& B)
         return false;
     }
 
-    return true;
+    if (dot_A > 0 || dot_B > 0 )
+    {    
+        return true;
+    }
+
+    return false;
 }
 
 // Handles the post collision velocities
 void Naive_Collisions::resolve(Particle& A, Particle& B)
 {
+    Vector2D A_pos = A.getObject().getPosition();
+    Vector2D B_pos = B.getObject().getPosition();
+
     // Line of impact for A and B, specifically from A to B
-    Vector2D normalBA = B.getObject().getPosition() - A.getObject().getPosition(); 
+    Vector2D normalBA = B_pos - A_pos; 
     normalBA = normalBA.Normalize();
     
     // Line of impact from B to A
-    Vector2D normalAB = A.getObject().getPosition() - B.getObject().getPosition();
+    Vector2D normalAB = A_pos - B_pos;
     normalAB = normalAB.Normalize();
 
     // initial velocity of A

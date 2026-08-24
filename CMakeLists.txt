@@ -15,10 +15,10 @@ find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 # --- Source files ---
 # List every .cpp file that should be compiled into the executable.
 set(SOURCES
-    main.cpp
     Vector2D.cpp
     Particle.cpp
-    Naive_Collisions.cpp
+    Naive-Collisions.cpp
+    Simulation.cpp
 )
 
 add_executable(PhysicsSim ${SOURCES})
@@ -27,7 +27,7 @@ add_executable(PhysicsSim ${SOURCES})
 target_sources(PhysicsSim PRIVATE
     Vector2D.h
     Particle.h
-    Naive_Collisions.h
+    Naive-Collisions.h
 )
 
 target_link_libraries(PhysicsSim sfml-graphics sfml-window sfml-system)
