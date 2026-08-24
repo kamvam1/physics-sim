@@ -345,8 +345,14 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     string acc_x = to_string(acceleration.getX());
     string acc_y = to_string(acceleration.getY());
 
+    // 3 Buttons in this menu: 2 for collision detection algorithm, 1 for exit
     Button interactable_buttons[3];
+
+    // 5 Text Boxes: 2 for Acceleration, 1 for Collision Detection, 2 for displaying current accelerations
+    // in x and y
     Button text_boxes[5];
+
+    // Sliders and their draggable components for X and Y accelerations
     RectangleShape lines[2];
     RectangleShape draggables[2];
 
@@ -428,20 +434,22 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
     float left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
     float length = right_most - left_most;
     
-    draggables[0].setPosition(left_most + acceleration.getX() / 30.f * length, window.getSize().y / 5.f);
-    draggables[1].setPosition(left_most + acceleration.getY() / 30.f * length, window.getSize().y / 5.f + 350.f);
+    draggables[0].setPosition(left_most + (acceleration.getX() + 25.f) / 50.f * length, window.getSize().y / 5.f);
+    draggables[1].setPosition(left_most + (acceleration.getY() + 25.f) / 50.f * length, window.getSize().y / 5.f + 350.f);
 
     while (window.isOpen())
     {
         Event event;
+        // Event Handler loop
         while (window.pollEvent(event))
         {
+            // Allows users to close the window if prompted
             if (event.type == Event::Closed)
             {
                 window.close();
             }
             
-            
+            // Ensures Objects stay in their initial positions despite resizing
             if (event.type == Event::Resized)
             {
                 View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
@@ -483,70 +491,81 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
             }
         }
         
+        // Button checks
         if (Mouse::isButtonPressed(Mouse::Left))
         {
             Vector2i click_position = Mouse::getPosition(window);
+            
+            // Back to Menu Button
             if (ButtonPressed(interactable_buttons[0], click_position.x, click_position.y))
             {
                 return;
             }
+            // Brute Force Collision Detection Button
             else if (ButtonPressed(interactable_buttons[1], click_position.x, click_position.y))
             {
                 collision_detection = 1;
                 interactable_buttons[1].rect.setFillColor(Color::Green);
                 interactable_buttons[2].rect.setFillColor(Color::Red);
             }
+            // Tree Collision Detection Button
             else if (ButtonPressed(interactable_buttons[2], click_position.x, click_position.y))
             {
                 collision_detection = 2;
                 interactable_buttons[1].rect.setFillColor(Color::Red);
                 interactable_buttons[2].rect.setFillColor(Color::Green);
             }
+            // X axis acceleration draggable
             else if (ButtonPressed(draggables[0], click_position.x, click_position.y)
                     || ButtonPressed(lines[0], click_position.x, click_position.y)
                     )
             {
                 draggables[0].setPosition(click_position.x, window.getSize().y / 5.f);
                 
-                acceleration.setX((click_position.x - left_most) / length * 30.f);
+                // Calculates new X-Acceleration based on draggable position
+                acceleration.setX((click_position.x - left_most) / length * 50.f - 25.f);
 
                 acc_x = to_string(acceleration.getX());
 
+                // Handles Extreme positions for the draggable
                 if (draggables[0].getPosition().x >= right_most)
                 {
                     draggables[0].setPosition(right_most, window.getSize().y / 5.f);
-                    acceleration.setX(15.f);
+                    acceleration.setX(25.f);
                     acc_x = to_string(acceleration.getX());
                 }
                 else if (draggables[0].getPosition().x <= left_most)
                 {
                     draggables[0].setPosition(left_most, window.getSize().y / 5.f);
-                    acceleration.setX(0.f);
+                    acceleration.setX(-25.f);
                     acc_x = to_string(acceleration.getX());
                 }
                 
                 text_boxes[3].text.setString(acc_x);
             }
+            // Y axis acceleration draggable
             else if (ButtonPressed(draggables[1], click_position.x, click_position.y)
             || ButtonPressed(lines[1], click_position.x, click_position.y)
                     )
             {
                 draggables[1].setPosition(click_position.x, window.getSize().y / 5.f + 350.f);
                 
-                acceleration.setY((click_position.x - left_most) / length * 30.f);
+                // Calculated new Y-Accelerations based on draggable position
+                acceleration.setY((click_position.x - left_most) / length * 50.f - 25.f);
                 
                 acc_y = to_string(acceleration.getY());
                 
+                // Handles Extreme positions for the draggable
                 if (draggables[1].getPosition().x >= right_most)
                 {
                     draggables[1].setPosition(right_most, window.getSize().y / 5.f + 350.f);
-                    acceleration.setY(15.f);
+                    acceleration.setY(25.f);
                     acc_y = to_string(acceleration.getY());
                 }
                 else if (draggables[1].getPosition().x <= left_most)
                 {
                     draggables[1].setPosition(left_most, window.getSize().y / 5.f + 350.f);
-                    acceleration.setY(0.f);
+                    acceleration.setY(-25.f);
                     acc_y = to_string(acceleration.getY());
                 }
                 
@@ -556,6 +575,7 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
         
         window.clear(Color(190,190,190));
 
+        // Drawing
         for (int i = 0; i < 3; i++)
         {
             window.draw(interactable_buttons[i].rect);
@@ -584,6 +604,7 @@ void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int
 int start_menu(RenderWindow& window, Font& font)
 {
     window.setTitle("Menu");
+    // 3 Buttons: Start, Settings and Exit
     Button buttons[3];
     
     buttons[0].text.setString("Start Simulation");
@@ -613,13 +634,17 @@ int start_menu(RenderWindow& window, Font& font)
     while (window.isOpen())
     {
         Event event;
+
+        // Event Handler Loop
         while (window.pollEvent(event))
         {
+            // Allows user to close the Menu if prompted
             if (event.type == Event::Closed)
             {
                 window.close();
             }
             
+            // Ensures objects stay in their initial positions despite resizing
             if (event.type == Event::Resized)
             {
                 View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
@@ -635,17 +660,23 @@ int start_menu(RenderWindow& window, Font& font)
                 buttons[2].text.setPosition(buttons[2].rect.getPosition());
             }
         }
+
+        // Handles Button pressing logic
         if (Mouse::isButtonPressed(Mouse::Left))
         {
             Vector2i click_position = Mouse::getPosition(window);
+
+            // Exit Button
             if (ButtonPressed(buttons[2], click_position.x, click_position.y))
             {
                 window.close();
             }
+            // Settings Button
             else if (ButtonPressed(buttons[1], click_position.x, click_position.y))
             {
                 return 1;
             }
+            // Start Simulation
             else if (ButtonPressed(buttons[0], click_position.x, click_position.y))
             {
                 return 2;
@@ -654,6 +685,7 @@ int start_menu(RenderWindow& window, Font& font)
 
         window.clear(Color(190, 190, 190));
 
+        // Drawing
         for (int i = 0; i < 3; i++)
         {
             window.draw(buttons[i].rect);
@@ -680,16 +712,18 @@ int main()
         return -1;
     }   
 
-    Vector2D acceleration(0.f, 15.f); // gravity 
+    Vector2D acceleration(0.f, 15.f); // just the gravity 
     int collision_detection = 1; // 1 for brute force, 2 for tree (experimental).
     int option = start_menu(window, font);
+    
+    // Infinite loop until user decides to either start or exit program
     while (option != 2)
     {
         option = start_menu(window, font);
         
         if (option == 0)
         {
-            break;
+            return 0;
         }
         else if (option == 1)
         {
@@ -697,17 +731,32 @@ int main()
         }
     }
     
+    // Used for Delta Time
     Clock time;
+    
+    // Contains all the particles in the simulation
     vector<Particle> particles;
+
+    // 3 Buttons: Create, Delete Particle, Exit Simulation
     Button buttons[3];
-    RectangleShape sim_boundary; // Box where the particles will be simulated.
+
+    // Box where all the particles are rendered
+    RectangleShape sim_boundary;
+
     bool create_particle = false; // When Create Particle Button is pressed, this will be true
     bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
+    
+    // Displays current fps
     Text frames;
+    
+    // Displays Number of Particles currently in the simulation
     Text particle_count;
-    float mass = 1.f;
-    float radius = 1.f;
 
+    // Initial Mass and Radius of the Particles
+    float mass = 1.f;
+    float radius = 20.f;
+
+    // Initializing and Creating Text, RectangleShapes, and Buttons
     particle_count = CreateText("Particle Count: " + to_string(particles.size()), font, 25, Color::Black);
     frames = CreateText("FPS: ", font, 28, Color::Black);
 
@@ -720,6 +769,7 @@ int main()
     sim_boundary.setOutlineColor(Color::Cyan);
     sim_boundary.setPosition(10.f + sim_boundary.getSize().x / 2.f, sim_boundary.getSize().y / 2.f + 8.f);
     
+    // Boundaries of the Simulation for resolving collisions against them
     float boundaries[4];
     boundaries[0] = 0.0f + 10.f;
     boundaries[1] = sim_boundary.getOrigin().x + sim_boundary.getSize().x / 2.f + 10.f;
@@ -749,27 +799,35 @@ int main()
     
     window.setTitle("Simulation");
 
-    int iteration = 0;
-    long total_time = 0;
+    // Used for Performance Checks 
+    // int iteration = 0;
+    // long total_time = 0;
 
     while (window.isOpen())
     {
         float delta_time = time.getElapsedTime().asSeconds();
+        
+        // Used to get accurate times
+        // Changing the Denominator changes the frames per second
         if (delta_time >= 1.f / 60.f)
-        {
+        {   
             time.restart();
             float fps = 1 / delta_time;
             frames.setString("FPS: " + to_string(fps));
             particle_count.setString("Particle Count: " + to_string(particles.size()));
 
             Event event;
+
+            // Event Handler
             while (window.pollEvent(event))
             {
+                // Allows user to close the Simulation if prompted
                 if (event.type == Event::Closed)
                 {
                     window.close();
                 }
-    
+                
+                // Ensures objects stay in their initial positions despite resizing
                 if (event.type == Event::Resized)
                 {
                     View view( FloatRect( Vector2f( 0.f,0.f ), Vector2f( window.getSize() ) ) );
@@ -798,32 +856,37 @@ int main()
                 }
             }
     
+            // Particle Update Loop
             for (int i = 0; i < particles.size(); i++)
             {
                 particles[i].Update_Velocity(delta_time, acceleration);
                 particles[i].Update_Position(delta_time, acceleration);
             }
             
-            if (particles.size() >= 100 && iteration < 500)
-            {
-                if (collision_detection == 1)
-                {
-                    Timer t;
-                    cout << "Iteration: " << iteration + 1 << endl;
-                    iteration++;
-                    brute_force(particles);
-                    total_time += t.Stop();
-                }
-                else if (collision_detection == 2)
-                {
-                    Timer t;
-                    cout << "Iteration: " << iteration + 1 << endl;
-                    iteration++;
-                    Tree(particles, 9, 5);
-                    total_time += t.Stop();
-                }
-            }
-            else if (particles.size() > 1)
+            // For Performance checking only.
+            // if (particles.size() >= 100 && iteration < 500)
+            // {
+            //     if (collision_detection == 1)
+            //     {
+            //         Timer t;
+            //         cout << "Iteration: " << iteration + 1 << endl;
+            //         iteration++;
+            //         brute_force(particles);
+            //         total_time += t.Stop();
+            //     }
+            //     else if (collision_detection == 2)
+            //     {
+            //         Timer t;
+            //         cout << "Iteration: " << iteration + 1 << endl;
+            //         iteration++;
+            //         Tree(particles, 9, 5);
+            //         total_time += t.Stop();
+            //     }
+            // }
+            // else 
+            
+            // Handles Collisions in between Particles
+            if (particles.size() > 1)
             {
                 if (collision_detection == 1)
                 {
@@ -835,27 +898,29 @@ int main()
                 }
             }
 
-            if (iteration == 500)
-            {
-                cout << "Average: " << total_time / 500 << " us, " << total_time * 0.001 / 500 << " ms" << endl;
-                iteration = 501;
-                if (collision_detection == 1)
-                {
-                    cout << "Brute Force" << endl;
-                }
-                else if (collision_detection == 2)
-                {
-                    cout << "Tree" << endl;
-                }
-            }
+            // if (iteration == 500)
+            // {
+            //     cout << "Average: " << total_time / 500 << " us, " << total_time * 0.001 / 500 << " ms" << endl;
+            //     iteration = 501;
+            //     if (collision_detection == 1)
+            //     {
+            //         cout << "Brute Force" << endl;
+            //     }
+            //     else if (collision_detection == 2)
+            //     {
+            //         cout << "Tree" << endl;
+            //     }
+            // }
             
+            // Handles Collisions with the Walls of the Simulation Box
             if (particles.size())
             {
                 boundary_collision(particles, boundaries);
             }
 
             window.clear(Color(170,170,170));
-    
+            
+            // Drawing 
             window.draw(sim_boundary);
             
             window.draw(particle_count);
@@ -866,38 +931,50 @@ int main()
                 window.draw(particles[i].getObject());
             }
             
+            // This is the basic simulation menu with only 3 buttons, only 
+            // rendered if the user hasnt pressed create and delete particles 
             if (create_particle == false && delete_particle == false)
             {
+                // Drawing the buttons
                 for (int i = 0; i < 3; i++)
                 {
                     window.draw(buttons[i].rect);
                     window.draw(buttons[i].text);
                 }
                 
+                // Handles the pressing of buttons
                 if (Mouse::isButtonPressed(Mouse::Left))
                 {
                     Vector2i click_position = Mouse::getPosition(window);
+                    // Create a Particle Button
                     if (ButtonPressed(buttons[0], click_position.x, click_position.y))
                     {
                         create_particle = true;
                     }
+                    // Delete a Particle Button
                     else if (ButtonPressed(buttons[1], click_position.x, click_position.y))
                     {   
                         delete_particle = true;
                     }
+                    // Exit Button
                     else if (ButtonPressed(buttons[2], click_position.x, click_position.y))
                     {
                         window.close();
                     }
                 }
             }
-    
+            
+            // Particle Creation Menu
             if (create_particle)
             {
+                // 3 Text Boxes: Instruction on how to create, Current Radius and Mass boxes.
                 Button text_boxes[3];
+
+                // Slider Components
                 RectangleShape lines[2];
                 RectangleShape draggables[2];
 
+                // Initializing and Creating Text, RectangleShapes, and Buttons
                 text_boxes[0].rect = CreateRectangle(450.f, 150.f, Color::Green);
                 text_boxes[1].rect = CreateRectangle(400.f, 150.f, Color(180,180,180));
                 text_boxes[2].rect = CreateRectangle(400.f, 150.f, Color(180,180,180));
@@ -916,8 +993,9 @@ int main()
                 text_boxes[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.65f);
                 text_boxes[2].text.setPosition(text_boxes[2].rect.getPosition());
                 
+                // Length of lines
                 float length = window.getSize().x * 0.2;
-
+                
                 for (int i = 0; i < 2; i++)
                 {
                     lines[i] = CreateRectangle(length, 15.f, Color::Black);
@@ -927,23 +1005,28 @@ int main()
                 lines[0].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.475f);
                 lines[1].setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.775f);
                 
+                // For handling extreme positions of the draggable
                 float right_most = lines[0].getPosition().x + lines[0].getSize().x / 2.f;
                 float left_most = lines[0].getPosition().x - lines[0].getSize().x / 2.f;
                 
-                draggables[0].setPosition(left_most + (radius - 1.f)/ (70.f - 1.f) * length, window.getSize().y * 0.475f);
+                draggables[0].setPosition(left_most + (radius - 20.f)/ (70.f - 20.f) * length, window.getSize().y * 0.475f);
                 draggables[1].setPosition(left_most + (mass - 1.f) / (100.f - 1.f) * length, window.getSize().y * 0.775f);
 
+                // Handles Slider logic and particle creation
                 if (Mouse::isButtonPressed(Mouse::Left))
                 {
                     Vector2i click_position = Mouse::getPosition(window);
+                    // Radius Draggable
                     if (ButtonPressed(draggables[0], click_position.x, click_position.y)
                     || ButtonPressed(lines[0], click_position.x, click_position.y)
                         )
                     {
                         draggables[0].setPosition(click_position.x, window.getSize().y * 0.475f);
                         
-                        radius = (click_position.x - left_most) / length * 70.f;
+                        // Calculates new Radius based on draggable position
+                        radius = (click_position.x - left_most) / length * 50.f + 20.f;
                         
+                        // Handles Extremes positions of the draggables
                         if (draggables[0].getPosition().x >= right_most)
                         {
                             draggables[0].setPosition(right_most, window.getSize().y * 0.475f);
@@ -952,19 +1035,22 @@ int main()
                         else if (draggables[0].getPosition().x <= left_most)
                         {
                             draggables[0].setPosition(left_most, window.getSize().y * 0.475f);
-                            radius = 1.f;
+                            radius = 20.f;
                         }
 
                         text_boxes[1].text.setString("Radius: " + to_string(radius));
                     }
+                    // Mass Draggable
                     else if (ButtonPressed(draggables[1], click_position.x, click_position.y)
                     || ButtonPressed(lines[1], click_position.x, click_position.y)
                             )
                     {
                         draggables[1].setPosition(click_position.x, window.getSize().y * 0.775);
 
+                        // Calculates new mass based on draggable position
                         mass = (click_position.x - left_most) / length * 100.f;
 
+                        // Handles Extreme postions for the draggable
                         if (draggables[1].getPosition().x >= right_most)
                         {
                             draggables[1].setPosition(right_most, window.getSize().y * 0.775);
@@ -978,6 +1064,8 @@ int main()
                         
                         text_boxes[2].text.setString("Mass: " + to_string(mass));
                     }
+                    // Checks whether the region clicked by the user is within the simulation boundaries
+                    // and checks no particle is obstructing that position the user clicked on
                     else if ((click_position.x >= radius && click_position.x <= sim_boundary.getSize().x - radius)
                     && (click_position.y >= radius && click_position.y <= sim_boundary.getSize().y)
                     &&  !ParticleObstructionCheck(radius, particles, click_position.x, click_position.y))
@@ -993,6 +1081,7 @@ int main()
                     }
                 }
                 
+                // Drawing
                 for (int i = 0; i < 3; i++)
                 {
                     window.draw(text_boxes[i].rect);
@@ -1006,8 +1095,10 @@ int main()
                 }
             }
     
+            // Deleting a particle
             if (delete_particle)
             {
+                // Ensures user is not able to delete when there are no particles
                 if (!particles.size())
                 {
                     Text error;
@@ -1049,6 +1140,7 @@ int main()
                         }
                     }
                 }
+                // Allows user to delete a particle
                 else
                 {
                     Text del_text;
@@ -1062,10 +1154,12 @@ int main()
                     del_text.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
     
                     window.draw(del_text);
-    
+                    
                     if (Mouse::isButtonPressed(Mouse::Left))
                     {   
                         Vector2i click_position = Mouse::getPosition(window);
+
+                        // Locates which particle was clicked on
                         for (int i = 0; i < particles.size(); i++)
                         {
                             if (ParticleClicked(particles[i], click_position))
