@@ -185,6 +185,117 @@ void brute_force(vector<Particle>& particles)
     }
 }
 
+// Recursively builds a tree where particles in a node decrease as you get deeper, leading to faster brute_force in the deepest nodes.
+// since there are less particles
+void TreeBuilder(vector<Particle>& particles, vector<int>& indices, int max_depth, int min_particles, int curr_depth = 0)
+{
+    if (curr_depth >= max_depth || indices.size() <= min_particles)
+    {
+        Naive_Collisions physics;
+
+        for (int i = 0; i < indices.size() - 1; i++)
+        {
+            int A = indices[i];
+            for (int j = i + 1; j < indices.size(); j++)
+            {
+                int B = indices[j];
+                if (physics.detect(particles[A], particles[B]))
+                {
+                    physics.resolve(particles[A], particles[B]);
+                }
+            }
+        }
+
+        return;
+    }
+
+    float min_x = 100000;
+    float max_x = -100000;
+    
+    float min_y = 100000;
+    float max_y = -100000;
+
+    for (auto it = indices.begin();  it < indices.end(); it++)
+    {
+        min_x = min(min_x, particles[*it].getPosition().x);
+        max_x = max(max_x, particles[*it].getPosition().x);
+
+        min_y = min(min_y, particles[*it].getPosition().y);
+        max_y = max(max_y, particles[*it].getPosition().y);
+    }
+
+    float variance_x = max_x - min_x;
+    float variance_y = max_y - min_y;
+
+    vector<int> left_indices;
+    vector<int> right_indices;
+
+    if (variance_x > variance_y)
+    {    
+        for (auto it = indices.begin(); it < indices.end(); it++)
+        {
+            if (particles[*it].getPosition().x <= min_x + variance_x / 2.f)
+            {
+                left_indices.push_back(*it);
+            }
+            else 
+            {
+                right_indices.push_back(*it);
+            }
+        }
+    }
+    else 
+    {
+        for (auto it = indices.begin(); it < indices.end(); it++)
+        {
+            if (particles[*it].getPosition().y <= min_y + variance_y / 2.f)
+            {
+                left_indices.push_back(*it);
+            }
+            else 
+            {
+                right_indices.push_back(*it);
+            }
+        }
+    }
+
+    if (left_indices.empty() || right_indices.empty())
+    {
+        Naive_Collisions physics;
+
+        for (int i = 0; i < indices.size() - 1; i++)
+        {
+            int A = indices[i];
+            for (int j = i + 1; j < indices.size(); j++)
+            {
+                int B = indices[j];
+                if (physics.detect(particles[A], particles[B]))
+                {
+                    physics.resolve(particles[A], particles[B]);
+                }
+            }
+        }
+
+        return;
+    }
+
+    TreeBuilder(particles, left_indices, max_depth, min_particles, curr_depth + 1);
+    TreeBuilder(particles, right_indices, max_depth, min_particles, curr_depth + 1);
+}
+
+// Initializes the indices and then calls TreeBuilder with them
+void Tree(vector<Particle>& particles, int max_depth, int min_particles)
+{
+    vector<int> indices;
+
+    for (int i = 0; i < particles.size(); i++)
+    {
+        indices.push_back(i);
+    }
+
+    TreeBuilder(particles, indices, max_depth, min_particles, 0);
+}
+
 // Handles Collisions of particles with the wall of the simulation
 void boundary_collision(vector<Particle>& particles, float boundaries[4])
 {
@@ -197,7 +308,7 @@ void boundary_collision(vector<Particle>& particles, float boundaries[4])
 }
 
 // Allows user to change certain constants used in the simulation.
-void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int collision_detection = 1)
+void settings_menu(RenderWindow& window, Font& font, Vector2D& acceleration, int& collision_detection)
 {
     window.setTitle("Settings");
 
@@ -674,10 +785,14 @@ int main()
                     brute_force(particles);
                     total_time += t.Stop();
                 }
-                // else if (collision_detection == 2)
-                // {
-                    
-                // }
+                else if (collision_detection == 2)
+                {
+                    Timer t;
+                    cout << "Iteration: " << iteration + 1 << endl;
+                    iteration++;
+                    Tree(particles, 9, 5);
+                    total_time += t.Stop();
+                }
             }
             else if (particles.size() > 1)
             {
@@ -685,17 +800,24 @@ int main()
                 {
                     brute_force(particles);
                 }
-                // else if (collision_detection == 2)
-                // {
-                    
-                // }
-                
+                else if (collision_detection == 2)
+                {
+                    Tree(particles, 9, 5);
+                }
             }
 
             if (iteration == 500)
             {
-                cout << "Total: " << total_time << ", Average: " << total_time / 500 << endl;
+                cout << "Average: " << total_time / 500 << " us, " << total_time * 0.001 / 500 << " ms" << endl;
                 iteration = 501;
+                if (collision_detection == 1)
+                {
+                    cout << "Brute Force" << endl;
+                }
+                else if (collision_detection == 2)
+                {
+                    cout << "Tree" << endl;
+                }
             }
             
             if (particles.size())
