@@ -36,6 +36,7 @@ class Timer
         chrono::time_point<chrono::high_resolution_clock> m_StartTimePoint;
 };
 
+// Actually a Text_Box, but it is mostly used for rendering buttons on screen, has a RectangleShape and a Text member
 struct Button
 {
     RectangleShape rect;
@@ -43,6 +44,9 @@ struct Button
 };
 
 // Creates a RectangleShape object and returns it
+// height: length of the RectangleShape
+// width: width of the RectangleShape
+// fill_color: the inner color of the RectangleShape.
 RectangleShape CreateRectangle(const float& height,const float& width,const Color& fill_color)
 {   
     RectangleShape rect;
@@ -55,6 +59,10 @@ RectangleShape CreateRectangle(const float& height,const float& width,const Colo
 }
 
 // Creates a Text object and returns it
+// display_text: The text that is to be shown in the screen
+// font: Text font
+// char_size: Size of the Characters
+// fill_color: The color of the text
 Text CreateText(const string& display_text, const Font& font,  const int& char_size, const Color& fill_color)
 {
     Text t;
@@ -69,6 +77,10 @@ Text CreateText(const string& display_text, const Font& font,  const int& char_s
 }
 
 // Creates a Text object and returns it, without the display_text param
+// to_init: Text that already has a display string.
+// font: Text font
+// char_size: Size of the Characters
+// fill_color: The color of the text
 void InitText(Text& to_init, const Font& font,  const int& char_size, const Color& fill_color)
 {
     to_init.setFont(font);
@@ -82,13 +94,16 @@ void InitText(Text& to_init, const Font& font,  const int& char_size, const Colo
 bool ParticleClicked(const Particle& p,const Vector2i& click_position)
 {
     CircleShape obj = p.getObject();
+
     float radius = obj.getRadius();
     float x_click_pos = float(click_position.x);
     float y_click_pos = float(click_position.y);
     
+    // Calculating the distance in both x and y axis.
     float dist_x = max(x_click_pos,obj.getPosition().x) - min(x_click_pos, obj.getPosition().x);
     float dist_y = max(y_click_pos,obj.getPosition().y) - min(y_click_pos, obj.getPosition().y);
 
+    // Checks whether the radius is larger than both distances
     if (dist_x <= radius && dist_y <= radius)
     {
         return true;
@@ -98,8 +113,14 @@ bool ParticleClicked(const Particle& p,const Vector2i& click_position)
 }
 
 // Makes sure there isnt a Particle where the user clicked 
+// Used in Particle Creation so that a Particle isnt created on top of another
+// radius_B: Radius of the Particle to be Created
+// particles: All current particles in the simulation
+// x_pos: X coordinate of the mouse click
+// Y_pos: Y coordinate of the mouse click
 bool ParticleObstructionCheck(float radius_B, vector<Particle>& particles, float x_pos, float y_pos)
 {
+    // Loop to find the nearest particle to the click position
     for (int i = 0; i < particles.size(); i++)
     {
         CircleShape obj = particles[i].getObject();
@@ -168,7 +189,8 @@ bool ButtonPressed(RectangleShape rect, float x_pos, float y_pos)
     return false;
 }
 
-// Checks every particle with every other particle
+// Checks every particle with every other particle to see if a collision occured
+// if a collision happened it gets resolved
 void brute_force(vector<Particle>& particles)
 {
     Naive_Collisions physics;
@@ -189,6 +211,7 @@ void brute_force(vector<Particle>& particles)
 // since there are less particles
 void TreeBuilder(vector<Particle>& particles, vector<int>& indices, int max_depth, int min_particles, int curr_depth = 0)
 {
+    // Base Case
     if (curr_depth >= max_depth || indices.size() <= min_particles)
     {
         Naive_Collisions physics;
@@ -209,6 +232,7 @@ void TreeBuilder(vector<Particle>& particles, vector<int>& indices, int max_dept
         return;
     }
 
+    // Finding Variation in both axis
     float min_x = 100000;
     float max_x = -100000;
     
@@ -230,6 +254,7 @@ void TreeBuilder(vector<Particle>& particles, vector<int>& indices, int max_dept
     vector<int> left_indices;
     vector<int> right_indices;
 
+    // Finding the best and splitting across the best axis 
     if (variance_x > variance_y)
     {    
         for (auto it = indices.begin(); it < indices.end(); it++)
@@ -259,6 +284,7 @@ void TreeBuilder(vector<Particle>& particles, vector<int>& indices, int max_dept
         }
     }
 
+    // Base case
     if (left_indices.empty() || right_indices.empty())
     {
         Naive_Collisions physics;
@@ -279,6 +305,7 @@ void TreeBuilder(vector<Particle>& particles, vector<int>& indices, int max_dept
         return;
     }
 
+    // Recursive Calls
     TreeBuilder(particles, left_indices, max_depth, min_particles, curr_depth + 1);
     TreeBuilder(particles, right_indices, max_depth, min_particles, curr_depth + 1);
 }
@@ -297,6 +324,8 @@ void Tree(vector<Particle>& particles, int max_depth, int min_particles)
 }
 
 // Handles Collisions of particles with the wall of the simulation
+// particles: All current Particles in the Simulation
+// boundaries: The 4 wall positions of the simulation
 void boundary_collision(vector<Particle>& particles, float boundaries[4])
 {
     Naive_Collisions physics;
