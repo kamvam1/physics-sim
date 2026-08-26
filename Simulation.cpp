@@ -4,6 +4,7 @@
 #include "Naive-Collisions.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <random>
 #include <string>
 #include <chrono>
 
@@ -701,6 +702,8 @@ int start_menu(RenderWindow& window, Font& font)
 // Simulation window
 int main()
 {
+    srand(time(0));
+
     RenderWindow window(VideoMode(2000, 1500),"Menu");
     window.setFramerateLimit(60);
     
@@ -737,14 +740,15 @@ int main()
     // Contains all the particles in the simulation
     vector<Particle> particles;
 
-    // 3 Buttons: Create, Delete Particle, Exit Simulation
-    Button buttons[3];
+    // 4 Buttons: Create, Auto Create , Delete Particle, Exit Simulation
+    Button buttons[4];
 
     // Box where all the particles are rendered
     RectangleShape sim_boundary;
-
+    
     bool create_particle = false; // When Create Particle Button is pressed, this will be true
     bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
+    bool auto_create; // When true, particles will be automatically created until this button is pressed 
     
     // Displays current fps
     Text frames;
@@ -777,10 +781,11 @@ int main()
     boundaries[3] = 0.0f + 10.f;
 
     buttons[0].text.setString("Create Particle");
-    buttons[1].text.setString("Delete Particle");
-    buttons[2].text.setString("Exit");
+    buttons[1].text.setString("Auto Create Particles");
+    buttons[2].text.setString("Delete Particle");
+    buttons[3].text.setString("Exit");
     
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {   
         buttons[i].rect = CreateRectangle(400.f, 150.f, Color::Red);
         
@@ -788,20 +793,23 @@ int main()
     }
 
     buttons[0].rect.setFillColor(Color::Green);
+    buttons[1].rect.setFillColor(Color::Green);
 
-    buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
-    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
+    buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f - 300.f);
+    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
+    buttons[3].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
 
     buttons[0].text.setPosition(buttons[0].rect.getPosition());
     buttons[1].text.setPosition(buttons[1].rect.getPosition());
     buttons[2].text.setPosition(buttons[2].rect.getPosition());
+    buttons[3].text.setPosition(buttons[3].rect.getPosition());
     
     window.setTitle("Simulation");
 
     // Used for Performance Checks 
-    // int iteration = 0;
-    // long total_time = 0;
+    int iteration = 0;
+    long total_time = 0;
 
     while (window.isOpen())
     {
@@ -846,13 +854,15 @@ int main()
                     particle_count.setPosition(window.getSize().x * 0.075f, window.getSize().y * 0.02f);
                     frames.setPosition(window.getSize().x * 0.88f, window.getSize().y * 0.02f);
     
-                    buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
-                    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-                    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
-    
+                    buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f - 300.f);
+                    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+                    buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
+                    buttons[3].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
+
                     buttons[0].text.setPosition(buttons[0].rect.getPosition());
                     buttons[1].text.setPosition(buttons[1].rect.getPosition());
                     buttons[2].text.setPosition(buttons[2].rect.getPosition());
+                    buttons[3].text.setPosition(buttons[3].rect.getPosition());
                 }
             }
     
@@ -864,29 +874,27 @@ int main()
             }
             
             // For Performance checking only.
-            // if (particles.size() >= 100 && iteration < 500)
-            // {
-            //     if (collision_detection == 1)
-            //     {
-            //         Timer t;
-            //         cout << "Iteration: " << iteration + 1 << endl;
-            //         iteration++;
-            //         brute_force(particles);
-            //         total_time += t.Stop();
-            //     }
-            //     else if (collision_detection == 2)
-            //     {
-            //         Timer t;
-            //         cout << "Iteration: " << iteration + 1 << endl;
-            //         iteration++;
-            //         Tree(particles, 9, 5);
-            //         total_time += t.Stop();
-            //     }
-            // }
-            // else 
-            
+            if (particles.size() == 500 && iteration < 500)
+            {
+                if (collision_detection == 1)
+                {
+                    Timer t;
+                    cout << "Iteration: " << iteration + 1 << endl;
+                    iteration++;
+                    brute_force(particles);
+                    total_time += t.Stop();
+                }
+                else if (collision_detection == 2)
+                {
+                    Timer t;
+                    cout << "Iteration: " << iteration + 1 << endl;
+                    iteration++;
+                    Tree(particles, 9, 5);
+                    total_time += t.Stop();
+                }
+            }
             // Handles Collisions in between Particles
-            if (particles.size() > 1)
+            else if (particles.size() > 1)
             {
                 if (collision_detection == 1)
                 {
@@ -897,20 +905,21 @@ int main()
                     Tree(particles, 9, 5);
                 }
             }
+            
 
-            // if (iteration == 500)
-            // {
-            //     cout << "Average: " << total_time / 500 << " us, " << total_time * 0.001 / 500 << " ms" << endl;
-            //     iteration = 501;
-            //     if (collision_detection == 1)
-            //     {
-            //         cout << "Brute Force" << endl;
-            //     }
-            //     else if (collision_detection == 2)
-            //     {
-            //         cout << "Tree" << endl;
-            //     }
-            // }
+            if (iteration == 500)
+            {
+                cout << "Average: " << total_time / 500 << " us, " << total_time * 0.001 / 500 << " ms" << endl;
+                iteration = 501;
+                if (collision_detection == 1)
+                {
+                    cout << "Brute Force" << endl;
+                }
+                else if (collision_detection == 2)
+                {
+                    cout << "Tree" << endl;
+                }
+            }
             
             // Handles Collisions with the Walls of the Simulation Box
             if (particles.size())
@@ -933,10 +942,10 @@ int main()
             
             // This is the basic simulation menu with only 3 buttons, only 
             // rendered if the user hasnt pressed create and delete particles 
-            if (create_particle == false && delete_particle == false)
+            if (create_particle == false && delete_particle == false && auto_create == false)
             {
                 // Drawing the buttons
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     window.draw(buttons[i].rect);
                     window.draw(buttons[i].text);
@@ -954,10 +963,14 @@ int main()
                     // Delete a Particle Button
                     else if (ButtonPressed(buttons[1], click_position.x, click_position.y))
                     {   
+                        auto_create = true;
+                    }
+                    else if (ButtonPressed(buttons[2], click_position.x, click_position.y))
+                    {
                         delete_particle = true;
                     }
                     // Exit Button
-                    else if (ButtonPressed(buttons[2], click_position.x, click_position.y))
+                    else if (ButtonPressed(buttons[3], click_position.x, click_position.y))
                     {
                         window.close();
                     }
@@ -1067,7 +1080,7 @@ int main()
                     // Checks whether the region clicked by the user is within the simulation boundaries
                     // and checks no particle is obstructing that position the user clicked on
                     else if ((click_position.x >= radius && click_position.x <= sim_boundary.getSize().x - radius)
-                    && (click_position.y >= radius && click_position.y <= sim_boundary.getSize().y)
+                    && (click_position.y >= radius && click_position.y <= sim_boundary.getSize().y - radius)
                     &&  !ParticleObstructionCheck(radius, particles, click_position.x, click_position.y))
                     {
                         Particle to_create(Vector2D(0.f,0.f), radius, mass);
@@ -1095,6 +1108,66 @@ int main()
                 }
             }
     
+            // Auto Create menu
+            if (auto_create)
+            {
+                if (particles.size() == 500)
+                {
+                    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+                    buttons[1].text.setPosition(buttons[1].rect.getPosition());
+
+                    auto_create = false;
+                }
+
+                buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.75f);
+                buttons[1].text.setPosition(buttons[1].rect.getPosition());
+
+                window.draw(buttons[1].rect);
+                window.draw(buttons[1].text);
+
+                float min_x = radius + 50.f;
+                float max_x = sim_boundary.getSize().x - radius - 50.f;
+
+                float min_y = radius + 50.f;
+                float max_y = sim_boundary.getSize().y - radius - 50.f;
+
+                random_device rd;
+                mt19937 gen(rd());
+                
+                uniform_real_distribution<> distrib_x(min_x, max_x);
+                uniform_real_distribution<> distrib_y(min_y, max_y);
+
+                float x_pos = distrib_x(gen);
+                float y_pos = distrib_y(gen);
+
+                if (!ParticleObstructionCheck(radius, particles, x_pos, y_pos)
+                    && (x_pos >= radius && x_pos <= sim_boundary.getSize().x - radius)
+                    && (y_pos >= radius && y_pos <= sim_boundary.getSize().y - radius)
+                    )
+                {
+                    Particle to_create(Vector2D(0.f,0.f), radius, mass);
+                    to_create.setPosition(Vector2f(x_pos, y_pos));
+                    int red = rand() % 255 + 10;
+                    int green = rand() % 255 + 10;
+                    int blue = rand() % 255 + 10;
+                    to_create.setColor(Color(red,green,blue));
+                    particles.push_back(to_create);
+                }
+
+                if (Mouse::isButtonPressed(Mouse::Left))
+                {
+                    Vector2i click_position = Mouse::getPosition(window);
+                    if (ButtonPressed(buttons[1], click_position.x, click_position.y))
+                    {
+                        buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+                        buttons[1].text.setPosition(buttons[1].rect.getPosition());
+
+                        auto_create = false;
+                    }
+                }
+
+            }
+
             // Deleting a particle
             if (delete_particle)
             {
