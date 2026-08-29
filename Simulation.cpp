@@ -740,15 +740,16 @@ int main()
     // Contains all the particles in the simulation
     vector<Particle> particles;
 
-    // 4 Buttons: Create, Auto Create , Delete Particle, Exit Simulation
-    Button buttons[4];
+    // 4 Buttons: Create, Auto Create, Delete Particle, Exit Simulation, Clear All Particles
+    Button buttons[5];
 
     // Box where all the particles are rendered
     RectangleShape sim_boundary;
     
     bool create_particle = false; // When Create Particle Button is pressed, this will be true
     bool delete_particle = false; // When Delete Particle Button is pressed, this will be true
-    bool auto_create; // When true, particles will be automatically created until this button is pressed 
+    bool auto_create = false; // When true, particles will be automatically created until this button is pressed 
+    bool clear_all = false; // When true, every particle will be deleted.
     
     // Displays current fps
     Text frames;
@@ -784,8 +785,9 @@ int main()
     buttons[1].text.setString("Auto Create Particles");
     buttons[2].text.setString("Delete Particle");
     buttons[3].text.setString("Exit");
+    buttons[4].text.setString("Clear All Particles");
     
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 5; i++)
     {   
         buttons[i].rect = CreateRectangle(400.f, 150.f, Color::Red);
         
@@ -798,18 +800,20 @@ int main()
     buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f - 300.f);
     buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
     buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-    buttons[3].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
+    buttons[3].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.92f);
+    buttons[4].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.75f);
 
     buttons[0].text.setPosition(buttons[0].rect.getPosition());
     buttons[1].text.setPosition(buttons[1].rect.getPosition());
     buttons[2].text.setPosition(buttons[2].rect.getPosition());
     buttons[3].text.setPosition(buttons[3].rect.getPosition());
+    buttons[4].text.setPosition(buttons[4].rect.getPosition());
     
     window.setTitle("Simulation");
 
     // Used for Performance Checks 
-    int iteration = 0;
-    long total_time = 0;
+    // int iteration = 0;
+    // long total_time = 0;
 
     while (window.isOpen())
     {
@@ -857,12 +861,14 @@ int main()
                     buttons[0].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f - 300.f);
                     buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
                     buttons[2].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.5f);
-                    buttons[3].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.9f);
+                    buttons[3].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.92f);
+                    buttons[4].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.75f);
 
                     buttons[0].text.setPosition(buttons[0].rect.getPosition());
                     buttons[1].text.setPosition(buttons[1].rect.getPosition());
                     buttons[2].text.setPosition(buttons[2].rect.getPosition());
                     buttons[3].text.setPosition(buttons[3].rect.getPosition());
+                    buttons[4].text.setPosition(buttons[4].rect.getPosition());
                 }
             }
     
@@ -874,27 +880,27 @@ int main()
             }
             
             // For Performance checking only.
-            if (particles.size() == 500 && iteration < 500)
-            {
-                if (collision_detection == 1)
-                {
-                    Timer t;
-                    cout << "Iteration: " << iteration + 1 << endl;
-                    iteration++;
-                    brute_force(particles);
-                    total_time += t.Stop();
-                }
-                else if (collision_detection == 2)
-                {
-                    Timer t;
-                    cout << "Iteration: " << iteration + 1 << endl;
-                    iteration++;
-                    Tree(particles, 9, 5);
-                    total_time += t.Stop();
-                }
-            }
+            // if (particles.size() == 500 && iteration < 500)
+            // {
+            //     if (collision_detection == 1)
+            //     {
+            //         Timer t;
+            //         cout << "Iteration: " << iteration + 1 << endl;
+            //         iteration++;
+            //         brute_force(particles);
+            //         total_time += t.Stop();
+            //     }
+            //     else if (collision_detection == 2)
+            //     {
+            //         Timer t;
+            //         cout << "Iteration: " << iteration + 1 << endl;
+            //         iteration++;
+            //         Tree(particles, 9, 5);
+            //         total_time += t.Stop();
+            //     }
+            // }
             // Handles Collisions in between Particles
-            else if (particles.size() > 1)
+            if (particles.size() > 1)
             {
                 if (collision_detection == 1)
                 {
@@ -907,19 +913,19 @@ int main()
             }
             
 
-            if (iteration == 500)
-            {
-                cout << "Average: " << total_time / 500 << " us, " << total_time * 0.001 / 500 << " ms" << endl;
-                iteration = 501;
-                if (collision_detection == 1)
-                {
-                    cout << "Brute Force" << endl;
-                }
-                else if (collision_detection == 2)
-                {
-                    cout << "Tree" << endl;
-                }
-            }
+            // if (iteration == 500)
+            // {
+            //     cout << "Average: " << total_time / 500 << " us, " << total_time * 0.001 / 500 << " ms" << endl;
+            //     iteration = 501;
+            //     if (collision_detection == 1)
+            //     {
+            //         cout << "Brute Force" << endl;
+            //     }
+            //     else if (collision_detection == 2)
+            //     {
+            //         cout << "Tree" << endl;
+            //     }
+            // }
             
             // Handles Collisions with the Walls of the Simulation Box
             if (particles.size())
@@ -942,10 +948,10 @@ int main()
             
             // This is the basic simulation menu with only 3 buttons, only 
             // rendered if the user hasnt pressed create and delete particles 
-            if (create_particle == false && delete_particle == false && auto_create == false)
+            if (!create_particle && !delete_particle && !auto_create && !clear_all)
             {
                 // Drawing the buttons
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     window.draw(buttons[i].rect);
                     window.draw(buttons[i].text);
@@ -973,6 +979,11 @@ int main()
                     else if (ButtonPressed(buttons[3], click_position.x, click_position.y))
                     {
                         window.close();
+                    }
+                    // Clear All Particles
+                    else if (ButtonPressed(buttons[4], click_position.x, click_position.y))
+                    {
+                        clear_all = true;
                     }
                 }
             }
@@ -1111,15 +1122,15 @@ int main()
             // Auto Create menu
             if (auto_create)
             {
-                if (particles.size() == 500)
-                {
-                    buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
-                    buttons[1].text.setPosition(buttons[1].rect.getPosition());
+                // if (particles.size() == 500)
+                // {
+                //     buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.3f);
+                //     buttons[1].text.setPosition(buttons[1].rect.getPosition());
 
-                    auto_create = false;
-                }
+                //     auto_create = false;
+                // }
 
-                buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.75f);
+                buttons[1].rect.setPosition(window.getSize().x * 0.85f, window.getSize().y * 0.65f);
                 buttons[1].text.setPosition(buttons[1].rect.getPosition());
 
                 window.draw(buttons[1].rect);
@@ -1246,6 +1257,16 @@ int main()
                 }
             }
             
+            if (clear_all)
+            {
+                if (particles.size() > 0)
+                {
+                    particles.clear();
+                }
+            
+                clear_all = false;
+            }
+
             window.display();
         }
     }
