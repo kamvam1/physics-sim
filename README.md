@@ -18,16 +18,20 @@ Upon tinkering with the settings you can return to the menu with the red button 
 Next the Simulation window:
 The Simulation window contains a white box which is the simulation box, where all the particles and physics will be 
 simulated
-Here you are greeted with 3 buttons on the right:
+Here you are greeted with 5 buttons on the right:
 The first allows you to create a particle:
 Here you can change the particles attribuites like radius and mass through the sliders
 and create a particle by clicking in the simulation box
 
-The second will allow you to delete one:
+The second will automatically create particles until pressed again. The radius and mass of every created particle is not random.
+
+The third will allow you to delete one:
 Just click on the particle you wish to delete
 
-The third will close the simulation
+The fourth will remove all particles on the screen currently.
+
+The fifth will close the simulation
 
 That is all.
 
-Thank you for using my physics simulation
+Thank you for using my physics simulation.
