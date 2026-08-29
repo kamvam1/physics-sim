@@ -85,6 +85,10 @@ void Naive_Collisions::resolve(Particle& A, Particle& B)
     Vector2D A_pos = A.getObject().getPosition();
     Vector2D B_pos = B.getObject().getPosition();
 
+    float A_radius = A.getObject().getRadius();
+    float B_radius = B.getObject().getRadius();
+    float dist = A_pos.Dist(B_pos);
+
     // Line of impact for A and B, specifically from A to B
     Vector2D normalBA = B_pos - A_pos; 
     normalBA = normalBA.Normalize();
@@ -92,6 +96,16 @@ void Naive_Collisions::resolve(Particle& A, Particle& B)
     // Line of impact from B to A
     Vector2D normalAB = A_pos - B_pos;
     normalAB = normalAB.Normalize();
+
+    if (dist - (A_radius + B_radius) < 0.0f)
+    {
+        float overlap = A_radius - (dist - B_radius);
+        A_pos -= normalBA * (overlap / 2.f);
+        B_pos += normalBA * (overlap / 2.f);
+        
+        A.setPosition(Vector2f(A_pos.getX(), A_pos.getY()));
+        B.setPosition(Vector2f(B_pos.getX(), B_pos.getY()));
+    }
 
     // initial velocity of A
     Vector2D init_vel_A = A.getVelocity();
